@@ -2,6 +2,8 @@ var express = require("express");
 var app = express();
 var port = 3700;
 
+//var _ = require("underscore");
+
 //app.get("/", function(req, res){
 //    res.send("It works2!");
 //});
@@ -16,7 +18,12 @@ var io = require('socket.io').listen(app.listen(port));
 io.sockets.on('connection', function (socket) {
     // socket is the client's socket,
     // the junction between the server and the user's browser.
-    socket.emit('message', {name:'Server', message: 'welcome to the chat' });
+    var systemFirstMessage = {
+    	name: 'Server',
+    	text: 'welcome to the chat!',
+    	type: 0
+    };
+    socket.emit('message', systemFirstMessage);
     socket.on('send', function (data) {
         // forward the data sent by the user to all other sockets
         io.sockets.emit('message', data);
