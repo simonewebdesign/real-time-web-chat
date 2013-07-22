@@ -16,7 +16,7 @@ var io = require('socket.io').listen(app.listen(port));
 io.sockets.on('connection', function (socket) {
     // socket is the client's socket,
     // the junction between the server and the user's browser.
-    socket.emit('message', { message: 'welcome to the chat' });
+    socket.emit('message', {name:'Server', message: 'welcome to the chat' });
     socket.on('send', function (data) {
         // forward the data sent by the user to all other sockets
         io.sockets.emit('message', data);
