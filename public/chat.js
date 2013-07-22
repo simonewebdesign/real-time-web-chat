@@ -1,17 +1,21 @@
 window.onload = function() {
 
-    var messages = [];
+    var rows = [];
     var socket = io.connect('http://localhost:3700');
     var field = document.querySelector('.field');
     var sendButton = document.querySelector('.send');
     var content = document.querySelector('.content');
 
     socket.on('message', function (data) {
-        if(data.message) {
-            messages.push(data.message);
+
+        console.log(data);
+
+        if (data.name && data.message) {
+            rows.push(data);
             var html = '';
-            for(var i=0; i<messages.length; i++) {
-                html += messages[i] + '<br />';
+            for(var i=0; i<rows.length; i++) {
+                html += "<b>" + rows[i].name + "</b>: " +
+                rows[i].message + '<br />';
             }
             content.innerHTML = html;
         } else {
@@ -21,6 +25,7 @@ window.onload = function() {
 
     sendButton.onclick = function() {
         var text = field.value;
-        socket.emit('send', { message: text });
+        var row = { name: 'pippo', message: text };
+        socket.emit('send', row);
     };
 };
