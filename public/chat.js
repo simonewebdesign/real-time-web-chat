@@ -23,9 +23,18 @@ window.onload = function() {
         }
     });
 
-    sendButton.onclick = function() {
-        var text = field.value;
+    var sendRow = function() {
+   		var text = field.value;
         var row = { name: 'pippo', message: text };
         socket.emit('send', row);
-    };
+        field.value = "";
+    }
+
+    sendButton.onclick = sendRow();
+
+    field.addEventListener("keyup", function(event){
+    	if(event.keyCode == 13) { //user pressed enter
+    		sendRow();
+    	}
+    });
 };
