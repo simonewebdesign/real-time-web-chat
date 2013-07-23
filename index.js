@@ -1,3 +1,6 @@
+
+/***** SERVER *****/
+
 var express = require("express");
 var app = express();
 var port = 3700;
@@ -14,6 +17,8 @@ app.use(express.static(__dirname + '/public'));
 // We pass the express server to socket.io
 var io = require('socket.io').listen(app.listen(port));
 
+///////////////////////////////////////////////////
+
 // Socket.io connection handler
 io.sockets.on('connection', function (socket) {
     // socket is the client's socket,
@@ -24,6 +29,7 @@ io.sockets.on('connection', function (socket) {
     	type: 0
     };
     socket.emit('message', systemFirstMessage);
+
     socket.on('send', function (data) {
         // forward the data sent by the user to all other sockets
         io.sockets.emit('message', data);
@@ -31,6 +37,10 @@ io.sockets.on('connection', function (socket) {
 });
 
 console.log("Listening on port " + port);
+
+
+
+//////////////////////////////////////////
 
 // Use Jade with ExpressJS
 app.set('views', __dirname + '/tpl');

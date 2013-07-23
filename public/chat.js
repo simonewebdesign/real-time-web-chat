@@ -1,64 +1,71 @@
-window.onload = function() {
 
-    // message 
-    // { name: // nome di chi l'ha spedito
-    //   text: // testo del messaggio
-    //   type: // tipo di messaggio
-    //      [
-    //          0: 'SYSTEM',
-    //          1: 'NORMAL',
-    //          2: 'SCREAM'
-    // ] }
+/***** CLIENT *****/
 
-    var messages = [];
-    var socket = io.connect('http://localhost:3700');
-    var field = document.querySelector('.field');
-    var sendButton = document.querySelector('.send');
-    var content = document.querySelector('.content');
+//window.onload = function() {
 
-    socket.on('message', function (data) {
+// message 
+// { name: // nome di chi l'ha spedito
+//   text: // testo del messaggio
+//   type: // tipo di messaggio
+//      [
+//          0: 'SYSTEM',
+//          1: 'NORMAL',
+//          2: 'SCREAM'
+// ] }
 
-        console.log(data);
+var messages = [];
+var socket = io.connect('http://localhost:3700');
+var field = document.querySelector('.field');
+var sendButton = document.querySelector('.send');
+var content = document.querySelector('.content');
 
-        if (data.name && data.text) {
-            messages.push(data);
-            var html = '';
-            for(var i=0; i<messages.length; i++) {
-                html += "<b>" + messages[i].name + "</b>: " +
-                messages[i].text + 
-                ' (type: ' + messages[i].type 
-                + ') <br />';
-            }
-            content.innerHTML = html;
-        } else {
-            console.log("Houston, we have a problem: ", data);
+socket.on('message', function (data) {
+
+    console.log(data);
+
+    if (data.name && data.text) {
+        messages.push(data);
+        var html = '';
+        for(var i=0; i<messages.length; i++) {
+            html += "<b>" + messages[i].name + "</b>: " +
+            messages[i].text + 
+            ' (type: ' + messages[i].type 
+            + ') <br />';
         }
+        content.innerHTML = html;
+    } else {
+        console.log("Houston, we have a problem: ", data);
+    }
+});
+
+var sendMessage = function(data) {
+    socket.emit('send', data);
+    field.value = ""; // clear input tag
+}
+
+sendButton.addEventListener("click", function(){
+
+    sendMessage({
+        name: 'paperino',
+        text: field.value,
+        type: 1
     });
 
-    var sendMessage = function(message) {
-        socket.emit('send', message);
-        field.value = ""; // clear input tag
-    }
+}, false);
 
-    sendButton.addEventListener("click", function(){
-
+field.addEventListener("keyup", function(event){
+	if(event.keyCode == 13) { //user pressed enter
         sendMessage({
-            name: 'paperino',
-            text: field.value,
-            type: 1
-        });
 
-    }, false);
+        })
+        // if message == "/nick new-nickname"
+        //if (field.value == "/nick new-nickname") {
+            //sendSystemMessage("new-nick");
+        //    return;
+        //}
+        //sendMessage("pippoHaPigiatoEnter", field.value);
+	}
+}, false);
 
-    field.addEventListener("keyup", function(event){
-    	if(event.keyCode == 13) { //user pressed enter
 
-            // if message == "/nick new-nickname"
-            if (field.value == "/nick new-nickname") {
-                //sendSystemMessage("new-nick");
-                return;
-            }
-            //sendMessage("pippoHaPigiatoEnter", field.value);
-    	}
-    }, false);
-};
+//};
