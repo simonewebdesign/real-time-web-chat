@@ -19,6 +19,8 @@ var field = document.querySelector('.field');
 var sendButton = document.querySelector('.send');
 var content = document.querySelector('.content');
 
+console.log($(field));
+
 socket.on('message', function (data) {
 
     console.log(data);
