@@ -18,7 +18,7 @@ app.use(express.static(__dirname + '/public'));
 var io = require('socket.io').listen(app.listen(port));
 
 // we want to use jQuery
-var $ = require('jquery');
+//var $ = require('jquery');
 
 ///////////////////////////////////////////////////
 
