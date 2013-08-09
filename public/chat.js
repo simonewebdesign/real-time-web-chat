@@ -13,13 +13,30 @@
 //          2: 'SCREAM'
 // ] }
 
-var messages = [];
-var socket = io.connect('http://localhost:3700');
-var field = document.querySelector('.field');
-var sendButton = document.querySelector('.send');
-var content = document.querySelector('.content');
+localStorage.setItem('name', 'pluto');
 
-console.log($(field));
+var messages = [],
+    socket = io.connect('http://localhost:3700'),
+    field = document.querySelector('.field'),
+    sendButton = document.querySelector('.send'),
+    content = document.querySelector('.content'),
+    message = function() {
+
+        var name = localStorage.getItem('name'),
+            text = field.value,
+            type = 1;
+
+        return {
+            name: name,
+            text: text,
+            type: type
+        }
+    },
+    sendMessage = function (data) {
+        socket.emit('send', data);
+        field.value = ""; // clear input tag
+    };
+
 
 socket.on('message', function (data) {
 
@@ -38,28 +55,17 @@ socket.on('message', function (data) {
     } else {
         console.log("Houston, we have a problem: ", data);
     }
-});
-
-var sendMessage = function(data) {
-    socket.emit('send', data);
-    field.value = ""; // clear input tag
-}
+})
 
 sendButton.addEventListener("click", function(){
 
-    sendMessage({
-        name: 'paperino',
-        text: field.value,
-        type: 1
-    });
+    sendMessage(message());
 
 }, false);
 
 field.addEventListener("keyup", function(event){
 	if(event.keyCode == 13) { //user pressed enter
-        sendMessage({
-
-        })
+        sendMessage(message());
         // if message == "/nick new-nickname"
         //if (field.value == "/nick new-nickname") {
             //sendSystemMessage("new-nick");
