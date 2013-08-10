@@ -1,6 +1,8 @@
 
 /***** CLIENT *****/
 
+// TODO fare il metodino getNick()
+
 localStorage.setItem('name', 'pluto');
 
 var messages = [],
@@ -24,7 +26,35 @@ var messages = [],
         }
     },
     sendMessage = function (data) {
-        socket.emit('send', data);
+        
+        var commandRegex = /^\/([a-z0-9_-]+)\s?([a-z0-9_-]+)?\s?([a-z0-9_-]+)?$/i,
+            isCommand = commandRegex.test(data.text);
+
+        if (isCommand) {
+
+            var matches = commandRegex.exec(data.text);
+                commandName = matches[1]; // TODO we will use a switch statement here
+            if (commandName === 'nick' || commandName === 'Nick') { // TODO use a regex!!
+                var newNickname = matches[2];
+                console.log(newNickname);
+                var emptyNickname = !!(newNickname == undefined && newNickname == '');
+                console.log(emptyNickname)
+                if (!emptyNickname) {
+
+                    socket.emit('send', {
+                        name: 'Server',
+                        text: localStorage.getItem('name') + ' changed his name to ' + newNickname,
+                        type: 0
+                    });
+
+                    localStorage.setItem('name', newNickname);
+                }
+            }
+
+        } else {
+            // send the message
+            socket.emit('send', data);
+        }
         field.value = ""; // clear input tag
     };
 
@@ -46,12 +76,10 @@ socket.on('message', function (data) {
     } else {
         console.log("Houston, we have a problem: ", data);
     }
-})
+});
 
 sendButton.addEventListener("click", function(){
-
     sendMessage(message());
-
 }, false);
 
 field.addEventListener("keyup", function(event){
