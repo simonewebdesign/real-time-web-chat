@@ -37,7 +37,7 @@ var messages = [],
             if (commandName === 'nick' || commandName === 'Nick') { // TODO use a regex!!
                 var newNickname = matches[2];
                 console.log(newNickname);
-                var emptyNickname = !!(newNickname == undefined && newNickname == '');
+                var emptyNickname = !!(newNickname == undefined || newNickname == '');
                 console.log(emptyNickname)
                 if (!emptyNickname) {
 
