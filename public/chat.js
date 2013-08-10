@@ -1,18 +1,6 @@
 
 /***** CLIENT *****/
 
-//window.onload = function() {
-
-// message 
-// { name: // nome di chi l'ha spedito
-//   text: // testo del messaggio
-//   type: // tipo di messaggio
-//      [
-//          0: 'SYSTEM',
-//          1: 'NORMAL',
-//          2: 'SCREAM'
-// ] }
-
 localStorage.setItem('name', 'pluto');
 
 var messages = [],
@@ -27,8 +15,11 @@ var messages = [],
             type = 1;
 
         return {
+            // nome di chi l'ha spedito
             name: name,
+            // testo del messaggio
             text: text,
+            // tipo di messaggio (NORMAL, SYSTEM, SCREAM?)
             type: type
         }
     },
@@ -71,9 +62,5 @@ field.addEventListener("keyup", function(event){
             //sendSystemMessage("new-nick");
         //    return;
         //}
-        //sendMessage("pippoHaPigiatoEnter", field.value);
 	}
 }, false);
-
-
-//};
