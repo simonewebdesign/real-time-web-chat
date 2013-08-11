@@ -12,10 +12,20 @@ var messages = [],
     notice = document.querySelector('.notice'),
 
     getNick = function() {
+        if (localStorage.getItem('name') === null) {
+            var _maxRandomInt = 99999,
+                randomInt = Math.floor(Math.random()*_maxRandomInt+1),
+                randomName = 'Guest' + randomInt;
+            localStorage.setItem('name', randomName);
+        }
         return localStorage.getItem('name');
     },
     setNick = function(nick){
-        localStorage.setItem('name', nick);
+        if (nick != '' && nick != undefined && nick != null) {
+            localStorage.setItem('name', nick);
+            return localStorage.getItem('name');
+        }
+        return false;
     },
 
     message = function() {
