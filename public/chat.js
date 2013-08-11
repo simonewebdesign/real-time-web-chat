@@ -34,7 +34,7 @@ var messages = [],
 
             var matches = commandRegex.exec(data.text);
                 commandName = matches[1]; // TODO we will use a switch statement here
-            if (commandName === 'nick' || commandName === 'Nick') { // TODO use a regex!!
+            if (/nick/i.test(commandName)) {
                 var newNickname = matches[2];
                 console.log(newNickname);
                 var emptyNickname = !!(newNickname == undefined || newNickname == '');
