@@ -1,8 +1,6 @@
 
 /***** CLIENT *****/
 
-localStorage.setItem('name', 'pluto');
-
 var messages = [],
     socket = io.connect('http://localhost:1337'),
 
@@ -78,7 +76,7 @@ var messages = [],
     };
 
 
-// server events
+/***** server socket events *****/
 
 socket.on('message', function (data) {
 
@@ -105,12 +103,11 @@ socket.on('foo', function(data) {
 });
 
 socket.on('broadcasting', function(data) {
-    console.log('CLIENT: ' + data);
+    notice.innerHTML = data.name + ' is writing...';
 });
 
 
-
-// client-side event listeners
+/***** client-side event listeners *****/
 
 sendButton.addEventListener("click", function(){
     sendMessage(message());
@@ -118,6 +115,17 @@ sendButton.addEventListener("click", function(){
 
 field.addEventListener("keyup", function(event){
 
+    // TODO complete this feature
+    // alerts other users that this user is writing a message
+    socket.emit('writing', {
+        name: getNick()
+    });
+
+    if(event.keyCode == 13) { //user pressed enter
+        sendMessage(message());
+    }
+
+/*
     console.log(field.value);
 
     if (field.value != '') {
@@ -128,18 +136,5 @@ field.addEventListener("keyup", function(event){
         console.log("empty");
         notice.innerHTML = '';
     }
-
-
-	if(event.keyCode == 13) { //user pressed enter
-        sendMessage(message());
-
-        socket.emit('writing', 'user: im writing...');
-
-        notice.innerHTML = '';
-        // if message == "/nick new-nickname"
-        //if (field.value == "/nick new-nickname") {
-            //sendSystemMessage("new-nick");
-        //    return;
-        //}
-	}
+*/
 }, false);
