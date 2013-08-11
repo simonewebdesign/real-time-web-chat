@@ -68,9 +68,11 @@ var messages = [],
     };
 
 
+// server events
+
 socket.on('message', function (data) {
 
-    console.log(data);
+    //console.log(data);
 
     if (data.name && data.text) {
         messages.push(data);
@@ -87,6 +89,19 @@ socket.on('message', function (data) {
     }
 });
 
+socket.on('foo', function(data) {
+
+    console.log(data);
+});
+
+socket.on('broadcasting', function(data) {
+    console.log('CLIENT: ' + data);
+});
+
+
+
+// client-side event listeners
+
 sendButton.addEventListener("click", function(){
     sendMessage(message());
 }, false);
@@ -97,7 +112,7 @@ field.addEventListener("keyup", function(event){
 
     if (field.value != '') {
         console.log("NOT empty");
-        notice.innerHTML = "Sta scrivendo...";
+        notice.innerHTML = "Nickname Sta scrivendo...";
 
     } else {
         console.log("empty");
@@ -107,6 +122,9 @@ field.addEventListener("keyup", function(event){
 
 	if(event.keyCode == 13) { //user pressed enter
         sendMessage(message());
+
+        socket.emit('writing', 'user: im writing...');
+
         notice.innerHTML = '';
         // if message == "/nick new-nickname"
         //if (field.value == "/nick new-nickname") {
