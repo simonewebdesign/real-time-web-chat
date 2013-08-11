@@ -1,6 +1,8 @@
 ## Features essenziali
 
-- **Emoticons**: copiate da skype, parsing della stringa text tramite regex; se uno dei match contiene una delle keywords delle emotincon fare il replace delle stesse con le immagini delle emoticons.
+- **Emoticons**: copiate da skype, parsing della stringa text tramite regex;
+se uno dei match contiene una delle keywords delle emoticon fare
+il replace delle stesse con le immagini delle emoticons.
 
 - **Orario invio messaggi**: stampa l'orario nel formato hh:mm.
 
@@ -8,8 +10,8 @@
 
 - **Desktop notifications**
 
-- **Salvataggio messaggi**: con l'utilizzo del localStorage o di indexed db. In alternativa uso di db noSql.
+- **Salvataggio messaggi**: con l'utilizzo del localStorage o di IndexedDB. In alternativa uso di db NoSQL.
 
 ## Features opzionali (future)
 
-- Pulsante Opzioni per cambiare : colore sfondo, font, colore font, dimensione globale font(implementato lato client), colore di fondo del testo, suoni 'toggle sounds'(abilitare o disabilitare);
+- **Pulsante Opzioni** per cambiare: colore sfondo, font, colore font, dimensione globale font(implementato lato client), colore di fondo del testo, suoni 'toggle sounds'(abilitare o disabilitare);
