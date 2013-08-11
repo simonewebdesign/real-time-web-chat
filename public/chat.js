@@ -6,7 +6,7 @@
 localStorage.setItem('name', 'pluto');
 
 var messages = [],
-    socket = io.connect('http://localhost:3700'),
+    socket = io.connect('http://localhost:1337'),
     field = document.querySelector('.field'),
     sendButton = document.querySelector('.send'),
     content = document.querySelector('.content'),

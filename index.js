@@ -1,9 +1,9 @@
 
 /***** SERVER *****/
 
-var express = require("express");
-var app = express();
-var port = 3700;
+var express = require("express"),
+    app = express(),
+    port = 1337;
 
 //var _ = require("underscore");
 
