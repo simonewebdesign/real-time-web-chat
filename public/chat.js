@@ -5,15 +5,19 @@ localStorage.setItem('name', 'pluto');
 
 var messages = [],
     socket = io.connect('http://localhost:1337'),
+
     field = document.querySelector('.field'),
     sendButton = document.querySelector('.send'),
     content = document.querySelector('.messages'),
+    notice = document.querySelector('.notice'),
+
     getNick = function() {
         return localStorage.getItem('name');
     },
     setNick = function(nick){
         localStorage.setItem('name', nick);
     },
+
     message = function() {
 
         var name = getNick(),
@@ -29,6 +33,7 @@ var messages = [],
             type: type
         }
     },
+
     sendMessage = function (data) {
         
         var commandRegex = /^\/([a-z0-9_-]+)\s?([a-z0-9_-]+)?\s?([a-z0-9_-]+)?$/i,
@@ -87,8 +92,22 @@ sendButton.addEventListener("click", function(){
 }, false);
 
 field.addEventListener("keyup", function(event){
+
+    console.log(field.value);
+
+    if (field.value != '') {
+        console.log("NOT empty");
+        notice.innerHTML = "Sta scrivendo...";
+
+    } else {
+        console.log("empty");
+        notice.innerHTML = '';
+    }
+
+
 	if(event.keyCode == 13) { //user pressed enter
         sendMessage(message());
+        notice.innerHTML = '';
         // if message == "/nick new-nickname"
         //if (field.value == "/nick new-nickname") {
             //sendSystemMessage("new-nick");
