@@ -7,7 +7,7 @@ var messages = [],
     socket = io.connect('http://localhost:1337'),
     field = document.querySelector('.field'),
     sendButton = document.querySelector('.send'),
-    content = document.querySelector('.content'),
+    content = document.querySelector('.messages'),
     getNick = function() {
         return localStorage.getItem('name');
     },
