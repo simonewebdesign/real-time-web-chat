@@ -80,9 +80,8 @@ var messages = [],
 
 socket.on('message', function (data) {
 
-    //console.log(data);
-
-    if (data.name && data.text) {
+    // TODO make it better!
+    if (data.text) {
         messages.push(data);
         var html = '';
         for(var i=0; i<messages.length; i++) {
@@ -125,16 +124,4 @@ field.addEventListener("keyup", function(event){
         sendMessage(message());
     }
 
-/*
-    console.log(field.value);
-
-    if (field.value != '') {
-        console.log("NOT empty");
-        notice.innerHTML = "Nickname Sta scrivendo...";
-
-    } else {
-        console.log("empty");
-        notice.innerHTML = '';
-    }
-*/
 }, false);
