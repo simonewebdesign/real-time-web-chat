@@ -1,8 +1,6 @@
 
 /***** CLIENT *****/
 
-// TODO fare il metodino getNick()
-
 localStorage.setItem('name', 'pluto');
 
 var messages = [],
@@ -10,9 +8,15 @@ var messages = [],
     field = document.querySelector('.field'),
     sendButton = document.querySelector('.send'),
     content = document.querySelector('.content'),
+    getNick = function() {
+        return localStorage.getItem('name');
+    },
+    setNick = function(nick){
+        localStorage.setItem('name', nick);
+    },
     message = function() {
 
-        var name = localStorage.getItem('name'),
+        var name = getNick(),
             text = field.value,
             type = 1;
 
@@ -43,11 +47,11 @@ var messages = [],
 
                     socket.emit('send', {
                         name: 'Server',
-                        text: localStorage.getItem('name') + ' changed his name to ' + newNickname,
+                        text: getNick() + ' changed his name to ' + newNickname,
                         type: 0
                     });
 
-                    localStorage.setItem('name', newNickname);
+                    setNick(newNickname);
                 }
             }
 
