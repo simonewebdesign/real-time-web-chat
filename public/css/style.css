@@ -3,6 +3,7 @@ body {
 }
 
 .content {
+  position: relative;
   width: 500px;
   height: 300px; 
   margin: 0 0 20px 0; 
@@ -10,6 +11,13 @@ body {
   overflow-y: scroll;
   background: white;
 }
+  .content .notice {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    background-color: #efe;
+    width: 100%;
+  }
 
 input.field {
   width: 450px;

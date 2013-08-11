@@ -1,19 +1,31 @@
 
 /***** CLIENT *****/
 
-localStorage.setItem('name', 'pluto');
-
 var messages = [],
     socket = io.connect('http://localhost:1337'),
+
     field = document.querySelector('.field'),
     sendButton = document.querySelector('.send'),
-    content = document.querySelector('.content'),
+    content = document.querySelector('.messages'),
+    notice = document.querySelector('.notice'),
+
     getNick = function() {
+        if (localStorage.getItem('name') === null) {
+            var _maxRandomInt = 99999,
+                randomInt = Math.floor(Math.random()*_maxRandomInt+1),
+                randomName = 'Guest' + randomInt;
+            localStorage.setItem('name', randomName);
+        }
         return localStorage.getItem('name');
     },
     setNick = function(nick){
-        localStorage.setItem('name', nick);
+        if (nick != '' && nick != undefined && nick != null) {
+            localStorage.setItem('name', nick);
+            return localStorage.getItem('name');
+        }
+        return false;
     },
+
     message = function() {
 
         var name = getNick(),
@@ -29,6 +41,7 @@ var messages = [],
             type: type
         }
     },
+
     sendMessage = function (data) {
         
         var commandRegex = /^\/([a-z0-9_-]+)\s?([a-z0-9_-]+)?\s?([a-z0-9_-]+)?$/i,
@@ -63,11 +76,12 @@ var messages = [],
     };
 
 
+/***** server socket events *****/
+
 socket.on('message', function (data) {
 
-    console.log(data);
-
-    if (data.name && data.text) {
+    // TODO make it better!
+    if (data.text) {
         messages.push(data);
         var html = '';
         for(var i=0; i<messages.length; i++) {
@@ -82,17 +96,32 @@ socket.on('message', function (data) {
     }
 });
 
+socket.on('foo', function(data) {
+
+    console.log(data);
+});
+
+socket.on('broadcasting', function(data) {
+    notice.innerHTML = data.name + ' is writing...';
+});
+
+
+/***** client-side event listeners *****/
+
 sendButton.addEventListener("click", function(){
     sendMessage(message());
 }, false);
 
 field.addEventListener("keyup", function(event){
-	if(event.keyCode == 13) { //user pressed enter
+
+    // TODO complete this feature
+    // alerts other users that this user is writing a message
+    socket.emit('writing', {
+        name: getNick()
+    });
+
+    if(event.keyCode == 13) { //user pressed enter
         sendMessage(message());
-        // if message == "/nick new-nickname"
-        //if (field.value == "/nick new-nickname") {
-            //sendSystemMessage("new-nick");
-        //    return;
-        //}
-	}
+    }
+
 }, false);

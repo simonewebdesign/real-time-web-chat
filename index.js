@@ -24,6 +24,9 @@ var io = require('socket.io').listen(app.listen(port));
 
 // Socket.io connection handler
 io.sockets.on('connection', function (socket) {
+
+    //console.log(socket);
+
     // socket is the client's socket,
     // the junction between the server and the user's browser.
     var systemFirstMessage = {
@@ -32,9 +35,19 @@ io.sockets.on('connection', function (socket) {
     	type: 0
     };
     socket.emit('message', systemFirstMessage);
+    
+    socket.on('writing', function (data) {
+        // To broadcast, simply add a `broadcast` flag to `emit`
+        // and `send` method calls. Broadcasting means sending a
+        // message to everyone else except for the socket that starts it.
+        this.broadcast.emit('broadcasting', data);
+    });
+
+    //socket.broadcast.emit('just a test BROADCAST', 'ARGOMENTO');
 
     socket.on('send', function (data) {
         // forward the data sent by the user to all other sockets
+        //console.log("MESSAGE SENT: " + JSON.stringify(data));
         io.sockets.emit('message', data);
     });
 });
