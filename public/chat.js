@@ -73,7 +73,34 @@ var messages = [],
             socket.emit('send', data);
         }
         field.value = ""; // clear input tag
-    };
+    },
+    // void
+    printMessage = function(message) {
+
+        if (!message.text) {
+            return;
+        }
+
+        // add the message to messages
+        messages.push(message);
+
+        // create the HTML element
+        var messageHTMLElement = document.createElement('div');
+        messageHTMLElement.setAttribute('class','message');
+
+        // name
+        var nicknameHTMLElement = document.createElement('b');
+        nicknameHTMLElement.innerHTML = message.name;
+
+        // append name to the element
+        messageHTMLElement.appendChild(nicknameHTMLElement);
+
+        // append text to the element
+        messageHTMLElement.innerHTML += ': ' + message.text;
+
+        // add the HTML element to content
+        content.appendChild(messageHTMLElement);
+    }
 
 
 /***** server socket events *****/
@@ -81,6 +108,7 @@ var messages = [],
 socket.on('message', function (data) {
 
     // TODO make it better!
+    /*
     if (data.text) {
         messages.push(data);
         var html = '';
@@ -94,6 +122,11 @@ socket.on('message', function (data) {
     } else {
         console.log("Houston, we have a problem: ", data);
     }
+    */
+
+
+    printMessage(data);
+
 });
 
 socket.on('foo', function(data) {
