@@ -18,6 +18,7 @@ var messages = [],
         }
         return localStorage.getItem('name');
     },
+
     setNick = function(nick){
         if (nick != '' && nick != undefined && nick != null) {
             localStorage.setItem('name', nick);
@@ -30,7 +31,8 @@ var messages = [],
 
         var name = getNick(),
             text = field.value,
-            type = 1;
+            type = 1,
+            time = new Date().getTime();
 
         return {
             // nome di chi l'ha spedito
@@ -38,7 +40,9 @@ var messages = [],
             // testo del messaggio
             text: text,
             // tipo di messaggio (NORMAL, SYSTEM, SCREAM?)
-            type: type
+            type: type,
+            // timestamp
+            time: time
         }
     },
 
@@ -74,7 +78,7 @@ var messages = [],
         }
         field.value = ""; // clear input tag
     },
-    // void
+
     printMessage = function(message) {
 
         if (!message.text) {
