@@ -106,31 +106,10 @@ var messages = [],
 /***** server socket events *****/
 
 socket.on('message', function (data) {
-
-    // TODO make it better!
-    /*
-    if (data.text) {
-        messages.push(data);
-        var html = '';
-        for(var i=0; i<messages.length; i++) {
-            html += "<b>" + messages[i].name + "</b>: " +
-            messages[i].text + 
-            ' (type: ' + messages[i].type 
-            + ') <br />';
-        }
-        content.innerHTML = html;
-    } else {
-        console.log("Houston, we have a problem: ", data);
-    }
-    */
-
-
     printMessage(data);
-
 });
 
 socket.on('foo', function(data) {
-
     console.log(data);
 });
 
@@ -142,7 +121,10 @@ socket.on('broadcasting', function(data) {
 /***** client-side event listeners *****/
 
 sendButton.addEventListener("click", function(){
-    sendMessage(message());
+
+    if (field.value.trim()) {
+        sendMessage(message());
+    }
 }, false);
 
 field.addEventListener("keyup", function(event){
@@ -154,7 +136,9 @@ field.addEventListener("keyup", function(event){
     });
 
     if(event.keyCode == 13) { //user pressed enter
-        sendMessage(message());
+        if (field.value.trim()) {
+            sendMessage(message());
+        }
     }
 
 }, false);
