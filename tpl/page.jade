@@ -1,8 +1,8 @@
 !!!
 html
   head
-    title= "Real time web chat"
-    link(rel='stylesheet', href='/css/style.css')
+    title='Real time web chat'
+    link(rel='stylesheet', href='css/style.css')
 
   body
     .content
@@ -12,5 +12,6 @@ html
       input.field
       input.send(type='button', value='send')
 
-    script(src='/socket.io/socket.io.js')
-    script(src='/chat.js')
+    script(src='scripts/lib/require.js')
+    script(src='socket.io/socket.io.js')
+    script(src='chat.js')
