@@ -60,10 +60,24 @@ console.log("Listening on port " + port);
 
 // Use Jade with ExpressJS
 app.set('views', __dirname + '/tpl');
-app.set('view engine', "jade");
+app.set('view engine', 'jade');
 app.engine('jade', require('jade').__express);
-app.get("/", function(req, res){
-    res.render("page");
+
+// main route
+app.get('/', function(req, res){
+    res.render('page'); // page.jade is our template
+});
+
+// test route
+app.get('/hello.txt', function(req, res){
+  var body = 'Hello World';
+  res.setHeader('Content-Type', 'text/plain');
+  res.setHeader('Content-Length', body.length);
+
+  var foo = require('./public/foo.json');
+  console.log(foo);
+
+  res.end(body);
 });
 
 
