@@ -1,7 +1,7 @@
 
 /***** CLIENT *****/
 
-define(['socket.io'], function() {
+define(['emoticons', 'socket.io'], function(emoticons) {
 
     var messages = [],
         users = [],
@@ -49,6 +49,28 @@ define(['socket.io'], function() {
             }
         },
 
+        searchAndReplaceEmoticonsIn = function(message) {
+            // TODO msn
+            for (var i=0; i<emoticons.skype.length; i++) {
+
+                var search = '',
+                    replacement = '';
+
+                for (var k in emoticons.skype[i]) {
+                    search = k,
+                    replacement = emoticons.skype[i][k];
+                }
+
+                var isContained = !!(message.text.indexOf(search) != -1);
+                if (isContained) {
+                    var htmlReplacement = '<img src="img/skype/' + replacement +
+                     '" alt="' + search + '" />';
+                    message.text = message.text.replace(search, htmlReplacement);
+                }                    
+            }
+            return message;
+        },
+
         sendMessage = function (data) {
             
             var commandRegex = /^\/([a-z0-9_-]+)\s?([a-z0-9_-]+)?\s?([a-z0-9_-]+)?$/i,
@@ -77,6 +99,9 @@ define(['socket.io'], function() {
                 }
 
             } else {
+
+                searchAndReplaceEmoticonsIn(data);
+                
                 // send the message
                 socket.emit('send', data);
             }
