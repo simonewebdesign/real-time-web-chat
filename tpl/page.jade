@@ -2,7 +2,6 @@
 html
   head
     title= "Real time web chat"
-    script(src='/socket.io/socket.io.js')
     link(rel='stylesheet', href='/css/style.css')
 
   body
@@ -13,6 +12,5 @@ html
       input.field
       input.send(type='button', value='send')
 
-    script(src='http://code.jquery.com/jquery-1.10.1.min.js')
-    script(src='http://code.jquery.com/jquery-migrate-1.2.1.min.js')
+    script(src='/socket.io/socket.io.js')
     script(src='/chat.js')
