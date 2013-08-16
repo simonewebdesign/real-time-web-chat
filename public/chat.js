@@ -55,12 +55,13 @@ var messages = [],
         if (isCommand) {
 
             var matches = commandRegex.exec(data.text);
-                commandName = matches[1]; // TODO we will use a switch statement here
-            if (/nick/i.test(commandName)) {
-                var newNickname = matches[2];
-                console.log(newNickname);
-                var emptyNickname = !!(newNickname == undefined || newNickname == '');
-                console.log(emptyNickname)
+                commandName = matches[1]; 
+
+            if (/nick/i.test(commandName)) { // TODO we will use a switch statement here
+
+                var newNickname = matches[2],
+                    emptyNickname = !!(newNickname == undefined || newNickname == '');
+
                 if (!emptyNickname) {
 
                     socket.emit('send', {
@@ -77,7 +78,8 @@ var messages = [],
             // send the message
             socket.emit('send', data);
         }
-        field.value = ""; // clear input tag
+        // clear input tag
+        field.value = "";
     },
 
     printMessage = function(message) {
@@ -113,9 +115,9 @@ socket.on('message', function (data) {
     printMessage(data);
 });
 
-socket.on('foo', function(data) {
-    console.log(data);
-});
+//socket.on('foo', function(data) {
+//    console.log(data);
+//});
 
 socket.on('broadcasting', function(data) {
     notice.innerHTML = data.name + ' is writing...';
