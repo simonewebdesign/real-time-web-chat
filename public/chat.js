@@ -2,6 +2,7 @@
 /***** CLIENT *****/
 
 var messages = [],
+    users = [],
     socket = io.connect('http://localhost:1337'),
 
     field = document.querySelector('.field'),
@@ -84,10 +85,6 @@ var messages = [],
         if (!message.text) {
             return;
         }
-
-        // add the message to messages
-        messages.push(message);
-
         // create the HTML element
         var messageHTMLElement = document.createElement('div');
         messageHTMLElement.setAttribute('class','message');
@@ -110,6 +107,9 @@ var messages = [],
 /***** server socket events *****/
 
 socket.on('message', function (data) {
+    // add the message to messages
+    messages.push(message);
+    // print it!
     printMessage(data);
 });
 
