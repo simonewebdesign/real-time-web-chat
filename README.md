@@ -1,31 +1,24 @@
-# Real Time Chat With NodeJS, Socket.io and ExpressJS
+# Real Time Chat
 
-## Features essenziali
+Crafted with NodeJS, ExpressJS and Socket.io.
 
-- **User Is Writing**
+## Getting started
 
-- **Emoticons**: copiate da skype, parsing della stringa text tramite regex;
-se uno dei match contiene una delle keywords delle emoticon fare
-il replace delle stesse con le immagini delle emoticons.
+[Download the application](https://github.com/simonewebdesign/real-time-web-chat/archive/master.zip), or clone the repository:
 
-- **Orario invio messaggi**: stampa l'orario nel formato hh:mm.
+`git clone https://github.com/simonewebdesign/real-time-web-chat.git`
 
-- **Desktop notifications**
+Start the server:
 
-- **Salvataggio messaggi**: con l'utilizzo del localStorage o di IndexedDB. In alternativa uso di db NoSQL.
+```
+npm start
 
-Probabilmente la scelta migliore ricade sul localStorage: si potrebbe settare
-un massimo di lunghezza sull'array messages, e quando si raggiunge tale limite
-si smette di salvare i messaggi. Questo puo` rivelarsi utile anche per
-risparmiare memoria durante l'uso dell'applicazione, rimuovendo i messaggi 
-troppo vecchi. In questo modo si evita pure di dover rimuovere i messaggi ogni
-tot tempo... cosa non molto fattibile.
+   info  - socket.io started
+Listening on port 1337
 
-- **Grafica**: costruire layout di base che prende il 100% delle dimensioni del browser.
+```
 
-## Features opzionali (future)
-
-- **Pulsante Opzioni** per cambiare: colore sfondo, font, colore font, dimensione globale font (implementato lato client), colore di fondo del testo, suoni 'toggle sounds' (abilitare o disabilitare);
+Then go to http://localhost:1337, and have fun!
 
 --
 
