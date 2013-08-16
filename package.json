@@ -8,5 +8,9 @@
         "jade": "latest",
         "underscore": "latest"
     },
-    "author": "developer"
+    "author": "developer",
+    "repository" : { 
+        "type": "git",
+        "url": "https://github.com/simonewebdesign/real-time-web-chat.git"
+    }
 }
