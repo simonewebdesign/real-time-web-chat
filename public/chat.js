@@ -111,26 +111,49 @@ define(['emoticons', 'socket.io'], function(emoticons) {
             field.value = "";
         },
 
-        printMessage = function(message) {
+        printMessage = function(data) {
 
-            if (!message.text) {
+            if (!data.text) {
                 return;
             }
             // create the HTML element
             var messageHTMLElement = document.createElement('div');
-            messageHTMLElement.setAttribute('class','message');
+            messageHTMLElement.setAttribute('class', 'message clearfix');
+
+            // create the wrappers
+            var nicknameWrapperHTMLElement = document.createElement('div'),
+                textWrapperHTMLElement = document.createElement('div'),
+                timeWrapperHTMLElement = document.createElement('div');
+
+            // set classes to wrappers
+            nicknameWrapperHTMLElement.setAttribute('class', 'name');
+            textWrapperHTMLElement.setAttribute('class', 'text');
+            timeWrapperHTMLElement.setAttribute('class', 'time');
 
             // name
             var nicknameHTMLElement = document.createElement('b');
-            nicknameHTMLElement.innerHTML = message.name;
+            nicknameHTMLElement.innerHTML = data.name;
 
-            // append name to the element
-            messageHTMLElement.appendChild(nicknameHTMLElement);
+            // text
+            var textHTMLElement = document.createElement('span');
+            textHTMLElement.innerHTML = data.text;
 
-            // append text to the element
-            messageHTMLElement.innerHTML += ': ' + message.text;
+            // time
+            var timeHTMLElement = document.createElement('time');
+            timeHTMLElement.innerHTML = (new Date()).toLocaleTimeString();
 
-            // add the HTML element to content
+
+            // append elements to the wrappers
+            nicknameWrapperHTMLElement.appendChild(nicknameHTMLElement);
+            textWrapperHTMLElement.appendChild(textHTMLElement);
+            timeWrapperHTMLElement.appendChild(timeHTMLElement);
+
+            // append wrappers to the .message
+            messageHTMLElement.appendChild(nicknameWrapperHTMLElement);
+            messageHTMLElement.appendChild(textWrapperHTMLElement);
+            messageHTMLElement.appendChild(timeWrapperHTMLElement);
+
+            // append the .message to content
             content.appendChild(messageHTMLElement);
         }
 
@@ -139,10 +162,12 @@ define(['emoticons', 'socket.io'], function(emoticons) {
 
     socket.on('message', function (data) {
         // add the message to messages
-        messages.push(message);
+        messages.push(data);
+        //console.log(messages);
         // print it!
         printMessage(data);
 
+        // notifications
         try {
 
             notification = new Notification(data.name, {
@@ -155,10 +180,10 @@ define(['emoticons', 'socket.io'], function(emoticons) {
 
             console.log('Permission is: ' + notification.permission);
 
-        } catch(e) {
-           // Browser does not support notifications
-           console.log("Browser does not support notifications.");
-           console.log(e);
+        } catch(exception) {
+           // Notifications not enabled or
+           // browser does not support them.
+           //console.log(exception);
         }
 
     });

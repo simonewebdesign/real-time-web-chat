@@ -10,6 +10,7 @@ body {
   border: solid 1px #999; 
   overflow-y: scroll;
   background: white;
+  padding: 5px; 
 }
   .content .notice {
     position: absolute;
@@ -21,4 +22,41 @@ body {
 
 input.field {
   width: 450px;
+}
+
+.message .name,
+.message .text,
+.message .time {
+  float: left;
+}
+
+.message .name {
+  padding-right: 5px;
+}
+.message .name:after {
+  content: ':';
+}
+.message .text {
+  /*
+  position: relative;
+  z-index: 10;
+  background-color: white;
+  */
+}
+.message .time {
+  
+  position: absolute;
+  right:5px;
+  
+  color: #999;
+}
+
+/* from the html5boilerplate */
+.clearfix:before,
+.clearfix:after {
+    content: " ";
+    display: table;
+}
+.clearfix:after {
+    clear: both;
 }

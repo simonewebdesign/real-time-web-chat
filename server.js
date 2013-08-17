@@ -32,7 +32,8 @@ io.sockets.on('connection', function (socket) {
     var systemFirstMessage = {
     	name: 'Server',
     	text: 'welcome to the chat!',
-    	type: 0
+    	type: 0,
+        time: (new Date()).getTime()
     };
     socket.emit('message', systemFirstMessage);
     
