@@ -1,16 +1,29 @@
+div, input {
+  box-sizing: border-box;
+}
+
+html, body {
+  height: 100%;
+}
+
 body {
-  background: #f2f2f2;
+  background-color: #aaa;
+  font-size: 12px;
+  font: 8pt/150% Tahoma, Helvetica, Arial, sans-serif;
+}
+
+input, button {
+  border: 0;
 }
 
 .content {
+  height:90%;
+
   position: relative;
-  width: 500px;
-  height: 300px; 
-  margin: 0 0 20px 0; 
-  border: solid 1px #999; 
-  overflow-y: scroll;
-  background: white;
-  padding: 5px; 
+  background-color: #ddd;
+
+  overflow-x: hidden;
+  overflow-y: scroll;  
 }
   .content .notice {
     position: absolute;
@@ -20,35 +33,41 @@ body {
     width: 100%;
   }
 
-input.field {
-  width: 450px;
+  .content, .message, input.field {
+    padding: 5px;
+  }
+
+.controls {
+  height: 10%;
+  background-color: #546;
+}
+  .controls * {
+    height: 100%;
+  }
+  .controls input.field {
+    width:75%;
+  }
+
+.message {
+  background: #e5e5e5;
+}
+.message:nth-child(2n+1) {
+  background-color: #eee;
 }
 
-.message .name,
 .message .text,
 .message .time {
   float: left;
 }
 
-.message .name {
-  padding-right: 5px;
-}
-.message .name:after {
-  content: ':';
-}
+.message .name {}
 .message .text {
-  /*
-  position: relative;
-  z-index: 10;
-  background-color: white;
-  */
+  width: 80%;
 }
 .message .time {
-  
-  position: absolute;
-  right:5px;
-  
+  width:20%;
   color: #999;
+  text-align: right;
 }
 
 /* from the html5boilerplate */
