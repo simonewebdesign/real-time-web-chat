@@ -11,7 +11,7 @@ requirejs.config({
 require(['chat']);
 
 
-require(['foo'], function(foo){
-	console.log('foo has been successfully loaded.');
-	console.log(foo);
-});
+//require(['foo'], function(foo){
+//	console.log('foo has been successfully loaded.');
+//	console.log(foo);
+//});

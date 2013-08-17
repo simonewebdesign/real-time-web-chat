@@ -5,12 +5,14 @@ define(['emoticons', 'socket.io'], function(emoticons) {
 
     var messages = [],
         users = [],
+        webNotificationsEnabled = false,
         socket = io.connect('http://localhost:1337'),
 
         field = document.querySelector('.field'),
         sendButton = document.querySelector('.send'),
         content = document.querySelector('.messages'),
         notice = document.querySelector('.notice'),
+        enableNotificationsButton = document.querySelector('.enable-notifications'),
 
         getNick = function() {
             if (localStorage.getItem('name') === null) {
@@ -35,7 +37,7 @@ define(['emoticons', 'socket.io'], function(emoticons) {
             var name = getNick(),
                 text = field.value,
                 type = 1,
-                time = new Date().getTime();
+                time = (new Date()).getTime();
 
             return {
                 // nome di chi l'ha spedito
@@ -140,6 +142,25 @@ define(['emoticons', 'socket.io'], function(emoticons) {
         messages.push(message);
         // print it!
         printMessage(data);
+
+        try {
+
+            notification = new Notification(data.name, {
+               body: data.text,
+               dir: 'auto',
+               lang: 'en',
+               tag: 'test',
+               icon: 'https://0.gravatar.com/avatar/70034fa76ec3ada7dc95ecb8dc01f74f&s=420'
+            });
+
+            console.log('Permission is: ' + notification.permission);
+
+        } catch(e) {
+           // Browser does not support notifications
+           console.log("Browser does not support notifications.");
+           console.log(e);
+        }
+
     });
 
     //socket.on('foo', function(data) {
@@ -153,14 +174,14 @@ define(['emoticons', 'socket.io'], function(emoticons) {
 
     /***** client-side event listeners *****/
 
-    sendButton.addEventListener("click", function(){
+    sendButton.addEventListener('click', function(){
 
         if (field.value.trim()) {
             sendMessage(message());
         }
     }, false);
 
-    field.addEventListener("keyup", function(event){
+    field.addEventListener('keyup', function(event){
 
         // TODO complete this feature
         // alerts other users that this user is writing a message
@@ -172,6 +193,25 @@ define(['emoticons', 'socket.io'], function(emoticons) {
             if (field.value.trim()) {
                 sendMessage(message());
             }
+        }
+
+    }, false);
+
+    enableNotificationsButton.addEventListener('click', function(event) {
+
+        console.log("button clicked, should now enable notifications");
+
+        // FIXME not crossbrowser
+        // FIXME not performant
+        if (window.webkitNotifications) {
+
+            Notification.requestPermission(function (perm) {
+                console.log("perm: " + perm);
+                if (perm === 'granted') {
+                    // Tell your app it's OK to send notifications
+                    webNotificationsEnabled = true;
+                }
+            });
         }
 
     }, false);
