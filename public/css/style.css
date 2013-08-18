@@ -64,6 +64,11 @@ input, button {
 .message .text {
   width: 80%;
 }
+
+.message .name {
+  color: #0078ca;
+}
+
 .message .time {
   width:20%;
   color: #999;
