@@ -7,6 +7,8 @@ define(['emoticons', 'socket.io'], function(emoticons) {
         users = [],
         webNotificationsEnabled = false,
         socket = io.connect('http://localhost:1337'),
+        timer,
+        delay = 3000,
 
         field = document.querySelector('.field'),
         sendButton = document.querySelector('.send'),
@@ -155,6 +157,17 @@ define(['emoticons', 'socket.io'], function(emoticons) {
 
             // append the .message to content
             content.appendChild(messageHTMLElement);
+        },
+
+        resetTimer = function() {
+            if (typeof timer != "undefined") {            
+                clearTimeout(timer);
+                timer = 0;
+            }
+
+            timer = setTimeout(function() {
+                notice.innerHTML = '';
+            }, delay);            
         }
 
 
@@ -195,12 +208,13 @@ define(['emoticons', 'socket.io'], function(emoticons) {
     socket.on('broadcasting', function(data) {
 
         console.log('broadcasted message:');
-        console.debug(data);
-        
+        console.debug(data);      
+
+        resetTimer();
 
         if (data.text == '') {
             notice.innerHTML = ''; 
-        } else {
+        }else {
             notice.innerHTML = data.name + ' is writing...';
         }
 
