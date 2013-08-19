@@ -76,6 +76,10 @@ define(['emoticons', 'socket.io'], function(emoticons) {
         },
 
         sendMessage = function (data) {
+
+            if (field.value.trim() == '') {
+                return;
+            }
             
             var commandRegex = /^\/([a-z0-9_-]+)\s?([a-z0-9_-]+)?\s?([a-z0-9_-]+)?$/i,
                 isCommand = commandRegex.test(data.text);
@@ -222,9 +226,7 @@ define(['emoticons', 'socket.io'], function(emoticons) {
 
     sendButton.addEventListener('click', function(){
 
-        if (field.value.trim()) {
-            sendMessage(message());
-        }
+        sendMessage(message());
         // alerts other users that this user is writing a message
         socket.emit('writing', message());
 
@@ -232,10 +234,8 @@ define(['emoticons', 'socket.io'], function(emoticons) {
 
     field.addEventListener('keyup', function(event){
 
-        if (event.keyCode == 13) { //user pressed enter
-            if (field.value.trim()) {
-                sendMessage(message());
-            }
+        if (event.keyCode == 13) { // user pressed enter
+            sendMessage(message());
         }
         // alerts other users that this user is writing a message
         socket.emit('writing', message());
