@@ -176,7 +176,7 @@ define(['emoticons', 'socket.io'], function(emoticons) {
     socket.on('message', function (data) {
         // add the message to messages
         messages.push(data);
-        //console.log(messages);
+
         // print it!
         printMessage(data);
 
@@ -206,9 +206,6 @@ define(['emoticons', 'socket.io'], function(emoticons) {
     //});
 
     socket.on('broadcasting', function(data) {
-
-        console.log('broadcasted message:');
-        console.debug(data);      
 
         resetTimer();
 
