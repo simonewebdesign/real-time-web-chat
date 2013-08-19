@@ -35,7 +35,7 @@ define(['emoticons', 'socket.io'], function(emoticons) {
         message = function() {
 
             var name = getNick(),
-                text = field.value,
+                text = field.value.trim(),
                 type = 1,
                 time = (new Date()).getTime();
 
@@ -193,13 +193,27 @@ define(['emoticons', 'socket.io'], function(emoticons) {
     //});
 
     socket.on('broadcasting', function(data) {
-        notice.innerHTML = data.name + ' is writing...';
+
+        console.log('broadcasted message:');
+        console.debug(data);
+        
+
+        if (data.text == '') {
+            notice.innerHTML = ''; 
+        } else {
+            notice.innerHTML = data.name + ' is writing...';
+        }
+
     });
 
 
     /***** client-side event listeners *****/
 
     sendButton.addEventListener('click', function(){
+
+        // TODO complete this feature
+        // alerts other users that this user is writing a message
+        socket.emit('writing', message());
 
         if (field.value.trim()) {
             sendMessage(message());
@@ -210,14 +224,16 @@ define(['emoticons', 'socket.io'], function(emoticons) {
 
         // TODO complete this feature
         // alerts other users that this user is writing a message
-        socket.emit('writing', {
-            name: getNick()
-        });
+        socket.emit('writing', message());
 
-        if(event.keyCode == 13) { //user pressed enter
+        if (event.keyCode == 13) { //user pressed enter
             if (field.value.trim()) {
                 sendMessage(message());
             }
+        }
+
+        if (field.innerHTML == '') {
+
         }
 
     }, false);
