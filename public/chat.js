@@ -211,30 +211,23 @@ define(['emoticons', 'socket.io'], function(emoticons) {
 
     sendButton.addEventListener('click', function(){
 
-        // TODO complete this feature
-        // alerts other users that this user is writing a message
-        socket.emit('writing', message());
-
         if (field.value.trim()) {
             sendMessage(message());
         }
+        // alerts other users that this user is writing a message
+        socket.emit('writing', message());
+
     }, false);
 
     field.addEventListener('keyup', function(event){
-
-        // TODO complete this feature
-        // alerts other users that this user is writing a message
-        socket.emit('writing', message());
 
         if (event.keyCode == 13) { //user pressed enter
             if (field.value.trim()) {
                 sendMessage(message());
             }
         }
-
-        if (field.innerHTML == '') {
-
-        }
+        // alerts other users that this user is writing a message
+        socket.emit('writing', message());
 
     }, false);
 
