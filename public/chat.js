@@ -177,6 +177,14 @@ define(['emoticons', 'socket.io'], function(emoticons) {
 
     /***** server socket events *****/
 
+    socket.on('connected', function(data) {
+        console.log('client connected. id: ' + data.id);
+    });
+
+    socket.on('disconnected', function(data) {
+        console.log('client disconnected. id: ' + data.id);
+    });
+
     socket.on('message', function (data) {
         // add the message to messages
         messages.push(data);
@@ -205,11 +213,7 @@ define(['emoticons', 'socket.io'], function(emoticons) {
 
     });
 
-    //socket.on('foo', function(data) {
-    //    console.log(data);
-    //});
-
-    socket.on('broadcasting', function(data) {
+    socket.on('written', function(data) {
 
         resetTimer();
 

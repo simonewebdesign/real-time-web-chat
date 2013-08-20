@@ -25,7 +25,7 @@ var io = require('socket.io').listen(app.listen(port));
 // Socket.io connection handler
 io.sockets.on('connection', function (socket) {
 
-    //console.log(socket);
+    console.log(socket);
 
     // socket is the client's socket,
     // the junction between the server and the user's browser.
@@ -37,19 +37,26 @@ io.sockets.on('connection', function (socket) {
     };
     socket.emit('message', systemFirstMessage);
     
+    // sending a message to everyone else except for the socket that starts it,
+    // to let everyone know that this current socket/user is now online
+    socket.broadcast.emit('connected', { id: socket.id });
+
     socket.on('writing', function (data) {
         // To broadcast, simply add a `broadcast` flag to `emit`
         // and `send` method calls. Broadcasting means sending a
         // message to everyone else except for the socket that starts it.
-        this.broadcast.emit('broadcasting', data);
+        this.broadcast.emit('written', data);
     });
-
-    //socket.broadcast.emit('just a test BROADCAST', 'ARGOMENTO');
 
     socket.on('send', function (data) {
         // forward the data sent by the user to all other sockets
         //console.log("MESSAGE SENT: " + JSON.stringify(data));
         io.sockets.emit('message', data);
+    });
+
+    socket.on('disconnect', function () {
+        console.log('A socket just disconnected.');
+        io.sockets.emit('disconnected', { id: this.id });
     });
 });
 
