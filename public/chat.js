@@ -77,6 +77,7 @@ define(['emoticons', 'socket.io'], function(emoticons) {
 
         sendMessage = function (data) {
 
+            // FIXME a message won't be sent if it doesn't come from field.
             if (field.value.trim() == '') {
                 return;
             }
@@ -178,11 +179,40 @@ define(['emoticons', 'socket.io'], function(emoticons) {
     /***** server socket events *****/
 
     socket.on('connected', function(data) {
-        console.log('client connected. id: ' + data.id);
+        console.log('client connected.');
+        console.log(data);
+
+        // set nickname
+        console.log('client: emitting set nickname');
+        socket.emit('set nickname', getNick());
+
+        //printMessage({
+        //    name: 'Server',
+        //    text: data.name + '(' + data.id + ')' + ' is now online!',
+        //    type: 0,
+        //    time: (new Date()).getTime()
+        //});
     });
 
     socket.on('disconnected', function(data) {
         console.log('client disconnected. id: ' + data.id);
+        printMessage({
+            name: 'Server',
+            text: data.name + ' disconnected.',
+            type: 0,
+            time: (new Date()).getTime()
+        });
+    });
+
+    socket.on('ready', function(data) {
+        console.log('ready: name is:' + data.name);
+        // NO sendMessage(), it won't work here.
+        printMessage({
+            name: 'Server',
+            text: data.name + ' is connected.',
+            type: 0,
+            time: (new Date()).getTime()
+        });
     });
 
     socket.on('message', function (data) {

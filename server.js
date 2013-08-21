@@ -20,26 +20,53 @@ var io = require('socket.io').listen(app.listen(port));
 // we want to use jQuery
 //var $ = require('jquery');
 
+//var setNickname = function() {
+//    var _maxRandomInt = 99999,
+//        randomInt = Math.floor(Math.random()*_maxRandomInt+1),
+//        randomName = 'Pippo' + randomInt;
+//    return randomName;
+//}
+
 ///////////////////////////////////////////////////
 
 // Socket.io connection handler
 io.sockets.on('connection', function (socket) {
 
-    console.log(socket);
+    //console.log(socket);
+    //console.log(window); this is of course not available in the server's side
 
     // socket is the client's socket,
     // the junction between the server and the user's browser.
-    var systemFirstMessage = {
-    	name: 'Server',
-    	text: 'welcome to the chat!',
-    	type: 0,
+
+    // This is the welcome message, from Server:
+    socket.emit('message', {
+        name: 'Server',
+        text: 'welcome to the chat!',
+        type: 0,
         time: (new Date()).getTime()
-    };
-    socket.emit('message', systemFirstMessage);
+    });
     
     // sending a message to everyone else except for the socket that starts it,
     // to let everyone know that this current socket/user is now online
-    socket.broadcast.emit('connected', { id: socket.id });
+    //socket.broadcast.emit('connected', { 
+    //    id: socket.id,
+    //    name: setNickname
+    //});
+
+    socket.emit('connected', { id: socket.id });
+
+    socket.on('set nickname', function (name) {
+        console.log('SERVER: nick change!!');
+        console.log('the new one must be ' + name);
+        socket.set('nickname', name, function () {
+            socket.broadcast.emit('ready', { name: name });
+        });
+    });
+
+    // praticamente dovro` settare il nickname lato server
+    //socket.set('nickname', name, function () {
+    //    socket.emit('ready', { name: name });
+    //})
 
     socket.on('writing', function (data) {
         // To broadcast, simply add a `broadcast` flag to `emit`
@@ -56,13 +83,17 @@ io.sockets.on('connection', function (socket) {
 
     socket.on('disconnect', function () {
         console.log('A socket just disconnected.');
-        io.sockets.emit('disconnected', { id: this.id });
+
+        socket.get('nickname', function(err, name) {
+            socket.broadcast.emit('disconnected', { 
+                id: this.id,
+                name: name
+            });
+        });
     });
 });
 
 console.log("Listening on port " + port);
-
-
 
 //////////////////////////////////////////
 
