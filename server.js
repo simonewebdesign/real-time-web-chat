@@ -5,27 +5,20 @@ var express = require("express"),
     app = express(),
     port = 1337;
 
+// This is how we use external libs
 //var _ = require("underscore");
+//var $ = require('jquery');
 
+// Just a test route (Express)
 //app.get("/", function(req, res){
-//    res.send("It works2!");
+//    res.send("It works!");
 //});
 
 app.use(express.static(__dirname + '/public'));
 
-//app.listen(port);
+// app.listen(port);
 // We pass the express server to socket.io
 var io = require('socket.io').listen(app.listen(port));
-
-// we want to use jQuery
-//var $ = require('jquery');
-
-//var setNickname = function() {
-//    var _maxRandomInt = 99999,
-//        randomInt = Math.floor(Math.random()*_maxRandomInt+1),
-//        randomName = 'Pippo' + randomInt;
-//    return randomName;
-//}
 
 ///////////////////////////////////////////////////
 
@@ -45,13 +38,6 @@ io.sockets.on('connection', function (socket) {
         type: 0,
         time: (new Date()).getTime()
     });
-    
-    // sending a message to everyone else except for the socket that starts it,
-    // to let everyone know that this current socket/user is now online
-    //socket.broadcast.emit('connected', { 
-    //    id: socket.id,
-    //    name: setNickname
-    //});
 
     socket.emit('connected', { id: socket.id });
 
@@ -62,11 +48,6 @@ io.sockets.on('connection', function (socket) {
             socket.broadcast.emit('ready', { name: name });
         });
     });
-
-    // praticamente dovro` settare il nickname lato server
-    //socket.set('nickname', name, function () {
-    //    socket.emit('ready', { name: name });
-    //})
 
     socket.on('writing', function (data) {
         // To broadcast, simply add a `broadcast` flag to `emit`
