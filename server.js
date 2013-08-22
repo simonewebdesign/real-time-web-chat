@@ -32,20 +32,28 @@ io.sockets.on('connection', function (socket) {
     // the junction between the server and the user's browser.
 
     // This is the welcome message, from Server:
-    socket.emit('message', {
-        name: 'Server',
-        text: 'welcome to the chat!',
-        type: 0,
-        time: (new Date()).getTime()
-    });
+    //socket.emit('message sent', {
+    //    name: 'Server',
+    //    text: 'welcome to the chat!',
+    //    type: 0,
+    //    time: (new Date()).getTime()
+    //});
 
     socket.emit('connected', { id: socket.id });
 
-    socket.on('set nickname', function (name) {
-        console.log('SERVER: nick change!!');
-        console.log('the new one must be ' + name);
-        socket.set('nickname', name, function () {
-            socket.broadcast.emit('ready', { name: name });
+    socket.on('recognizing user', function (user) {
+
+        socket.set('nickname', user.name, function () {
+            socket.emit('user recognized', user);
+        });        
+    });
+
+    socket.on('set nickname', function (user) {
+        socket.set('nickname', user.newName, function () {
+            // FIXME even the user that has changed his name should be notified
+            console.log('PIPPO:');
+            console.log(user);
+            socket.broadcast.emit('nickname set', user);
         });
     });
 
@@ -56,18 +64,17 @@ io.sockets.on('connection', function (socket) {
         this.broadcast.emit('written', data);
     });
 
-    socket.on('send', function (data) {
+    socket.on('send message', function (data) {
         // forward the data sent by the user to all other sockets
         //console.log("MESSAGE SENT: " + JSON.stringify(data));
-        io.sockets.emit('message', data);
+        io.sockets.emit('message sent', data);
     });
 
     socket.on('disconnect', function () {
-        console.log('A socket just disconnected.');
 
         socket.get('nickname', function(err, name) {
             socket.broadcast.emit('disconnected', { 
-                id: this.id,
+                //id: this.id,
                 name: name
             });
         });

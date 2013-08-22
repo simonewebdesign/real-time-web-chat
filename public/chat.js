@@ -1,14 +1,14 @@
 
 /***** CLIENT *****/
 
-define(['emoticons', 'socket.io'], function(emoticons) {
+define(['emoticons', 'socket.io'], function (emoticons) {
 
-    var messages = [],
-        users = [],
-        webNotificationsEnabled = false,
-        socket = io.connect('http://localhost:1337'),
+    var socket = io.connect('http://localhost:1337'),
         timer,
         delay = 3000,
+//        users = [],
+//        messages = [],
+//        webNotificationsEnabled = false,        
 
         field = document.querySelector('.field'),
         sendButton = document.querySelector('.send'),
@@ -16,24 +16,34 @@ define(['emoticons', 'socket.io'], function(emoticons) {
         notice = document.querySelector('.notice'),
         enableNotificationsButton = document.querySelector('.enable-notifications'),
 
+        // gets nickname from localStorage:
+        // return: string nickname, or null if nick hasn't been set yet.
         getNick = function() {
-            if (localStorage.getItem('name') === null) {
-                var _maxRandomInt = 99999,
-                    randomInt = Math.floor(Math.random()*_maxRandomInt+1),
-                    randomName = 'Guest' + randomInt;
-                localStorage.setItem('name', randomName);
-            }
             return localStorage.getItem('name');
         },
 
-        setNick = function(nick){
-            if (nick != '' && nick != undefined && nick != null) {
+        // save nickname on localStorage
+        // return: true on success, false otherwise.
+        setNick = function (nick) {
+            if (nick !== '' && nick !== undefined && nick !== null) {
                 localStorage.setItem('name', nick);
-                return localStorage.getItem('name');
+                return true;
             }
             return false;
         },
 
+        // generates a random nickname.
+        // useful when an unknown user connects for the first time.
+        // return: string random nick
+        generateNick = function() {
+            var _maxRandomInt = 99999,
+                randomInt = Math.floor(Math.random()*_maxRandomInt+1),
+                randomName = 'Guest' + randomInt;
+            return randomName;
+        },
+
+        // creates a new message.
+        // return: object the message
         message = function() {
 
             var name = getNick(),
@@ -53,7 +63,7 @@ define(['emoticons', 'socket.io'], function(emoticons) {
             }
         },
 
-        searchAndReplaceEmoticonsIn = function(message) {
+        searchAndReplaceEmoticonsIn = function (message) {
             // TODO msn
             for (var i=0; i<emoticons.skype.length; i++) {
 
@@ -75,6 +85,36 @@ define(['emoticons', 'socket.io'], function(emoticons) {
             return message;
         },
 
+        // evaluates a command.
+        // string command the command name.
+        // array args the command arguments.
+        // return: void
+        evaluateCommand = function (command, args) {
+            // command name: nick
+            // description: set a new nickname
+            // usage: /nick <nickname>
+            if (/nick/i.test(command)) { // TODO we will use a switch statement here
+
+                var name = args[0];
+
+                if (name !== undefined && name !== '') {
+
+                    // name is certainly valid because the command regex has
+                    // already validated it.
+
+                    // notify the server and everything else that
+                    // I just changed the nick
+                    socket.emit('set nickname', {
+                        oldName: getNick(), // if we are setting a new nickname, we certainly have a nickname already.
+                        newName: name
+                    });
+
+                    // update my nickname
+                    setNick(name);
+                }
+            }
+        },
+
         sendMessage = function (data) {
 
             // FIXME a message won't be sent if it doesn't come from field.
@@ -88,37 +128,24 @@ define(['emoticons', 'socket.io'], function(emoticons) {
             if (isCommand) {
 
                 var matches = commandRegex.exec(data.text);
-                    commandName = matches[1]; 
+                    command = matches[1],
+                    args = [matches[2], matches[3]];
 
-                if (/nick/i.test(commandName)) { // TODO we will use a switch statement here
-
-                    var newNickname = matches[2],
-                        emptyNickname = !!(newNickname == undefined || newNickname == '');
-
-                    if (!emptyNickname) {
-
-                        socket.emit('send', {
-                            name: 'Server',
-                            text: getNick() + ' changed his name to ' + newNickname,
-                            type: 0
-                        });
-
-                        setNick(newNickname);
-                    }
-                }
+                evaluateCommand(command, args);
 
             } else {
 
                 searchAndReplaceEmoticonsIn(data);
-                
-                // send the message
-                socket.emit('send', data);
+                socket.emit('send message', data);
             }
             // clear input tag
             field.value = "";
         },
 
-        printMessage = function(data) {
+        // generates the HTML element representing a message, and prints it.
+        // object data the message to print.
+        // return: void
+        printMessage = function (data) {
 
             if (!data.text) {
                 return;
@@ -164,6 +191,8 @@ define(['emoticons', 'socket.io'], function(emoticons) {
             content.appendChild(messageHTMLElement);
         },
 
+        // for the "user is writing..." feature
+        // return: void
         resetTimer = function() {
             if (typeof timer != "undefined") {            
                 clearTimeout(timer);
@@ -178,14 +207,29 @@ define(['emoticons', 'socket.io'], function(emoticons) {
 
     /***** server socket events *****/
 
-    socket.on('connected', function(data) {
-        console.log('client connected.');
-        console.log(data);
+    socket.on('connected', function (data) {
 
-        // set nickname
-        console.log('client: emitting set nickname');
-        socket.emit('set nickname', getNick());
+        //console.log('client connected.');
+        //console.log(data);
 
+        // First of all, let's set the nickname.
+        // NICKNAME
+        var user = {
+            name: '',
+            isNewish: false
+        };
+        // new user?
+        if (getNick() === null) {
+            // set nickname for the first time
+            user.name = generateNick();
+            user.isNewish = true;
+            setNick(user.name);
+        } else {
+            // returning user
+            user.name = getNick();
+            user.isNewish = false;
+        }
+        socket.emit('recognizing user', user);
         //printMessage({
         //    name: 'Server',
         //    text: data.name + '(' + data.id + ')' + ' is now online!',
@@ -194,7 +238,43 @@ define(['emoticons', 'socket.io'], function(emoticons) {
         //});
     });
 
-    socket.on('disconnected', function(data) {
+    socket.on('user recognized', function (user) {
+
+        if (user.isNewish) {
+            // print a welcome message
+            printMessage({
+                name: 'Server',
+                text: user.name + ' is connected. Welcome!',
+                type: 0,
+                time: (new Date()).getTime()
+            });
+            // and save the nickname on client-side
+            setNick(user.name);
+
+        } else {
+            // print a welcome back message
+            printMessage({
+                name: 'Server',
+                text: 'Welcome back, ' + user.name + '!',
+                type: 0,
+                time: (new Date()).getTime()
+            });
+        }
+    });
+
+    socket.on('nickname set', function (user) {
+
+        // This is a received broadcast
+
+        printMessage({
+            name: 'Server',
+            text: user.oldName + ' changed his name to ' + user.newName,
+            type: 0,
+            time: (new Date()).getTime(),
+        });
+    });
+
+    socket.on('disconnected', function (data) {
         console.log('client disconnected. id: ' + data.id);
         printMessage({
             name: 'Server',
@@ -204,46 +284,34 @@ define(['emoticons', 'socket.io'], function(emoticons) {
         });
     });
 
-    socket.on('ready', function(data) {
-        console.log('ready: name is:' + data.name);
-        // NO sendMessage(), it won't work here.
-        printMessage({
-            name: 'Server',
-            text: data.name + ' is connected.',
-            type: 0,
-            time: (new Date()).getTime()
-        });
-    });
-
-    socket.on('message', function (data) {
+    socket.on('message sent', function (data) {
         // add the message to messages
-        messages.push(data);
+        // messages.push(data);
 
         // print it!
         printMessage(data);
 
         // notifications
-        try {
-
-            notification = new Notification(data.name, {
-               body: data.text,
-               dir: 'auto',
-               lang: 'en',
-               tag: 'test',
-               icon: 'https://0.gravatar.com/avatar/70034fa76ec3ada7dc95ecb8dc01f74f&s=420'
-            });
-
-            console.log('Permission is: ' + notification.permission);
-
-        } catch(exception) {
-           // Notifications not enabled or
-           // browser does not support them.
-           //console.log(exception);
-        }
-
+//        try {
+//
+//            notification = new Notification(data.name, {
+//               body: data.text,
+//               dir: 'auto',
+//               lang: 'en',
+//               tag: 'test',
+//               icon: 'https://0.gravatar.com/avatar/70034fa76ec3ada7dc95ecb8dc01f74f&s=420'
+//            });
+//
+//            console.log('Permission is: ' + notification.permission);
+//
+//        } catch (exception) {
+//           // Notifications not enabled or
+//           // browser does not support them.
+//           //console.log(exception);
+//        }
     });
 
-    socket.on('written', function(data) {
+    socket.on('written', function (data) {
 
         resetTimer();
 
@@ -252,13 +320,12 @@ define(['emoticons', 'socket.io'], function(emoticons) {
         }else {
             notice.innerHTML = data.name + ' is writing...';
         }
-
     });
 
 
     /***** client-side event listeners *****/
 
-    sendButton.addEventListener('click', function(){
+    sendButton.addEventListener('click', function () {
 
         sendMessage(message());
         // alerts other users that this user is writing a message
@@ -266,7 +333,7 @@ define(['emoticons', 'socket.io'], function(emoticons) {
 
     }, false);
 
-    field.addEventListener('keyup', function(event){
+    field.addEventListener('keyup', function (event) {
 
         if (event.keyCode == 13) { // user pressed enter
             sendMessage(message());
@@ -276,23 +343,23 @@ define(['emoticons', 'socket.io'], function(emoticons) {
 
     }, false);
 
-    enableNotificationsButton.addEventListener('click', function(event) {
-
-        console.log("button clicked, should now enable notifications");
-
-        // FIXME not crossbrowser
-        // FIXME not performant
-        if (window.webkitNotifications) {
-
-            Notification.requestPermission(function (perm) {
-                console.log("perm: " + perm);
-                if (perm === 'granted') {
-                    // Tell your app it's OK to send notifications
-                    webNotificationsEnabled = true;
-                }
-            });
-        }
-
-    }, false);
+//    enableNotificationsButton.addEventListener('click', function (event) {
+//
+//        console.log("button clicked, should now enable notifications");
+//
+//        // FIXME not crossbrowser
+//        // FIXME not performant
+//        if (window.webkitNotifications) {
+//
+//            Notification.requestPermission(function (perm) {
+//                console.log("perm: " + perm);
+//                if (perm === 'granted') {
+//                    // Tell your app it's OK to send notifications
+//                    webNotificationsEnabled = true;
+//                }
+//            });
+//        }
+//
+//    }, false);
 
 });
