@@ -42,10 +42,8 @@ io.sockets.on('connection', function (socket) {
     socket.emit('connected', { id: socket.id });
 
     socket.on('set nickname', function (name) {
-        console.log('SERVER: nick change!!');
-        console.log('the new one must be ' + name);
         socket.set('nickname', name, function () {
-            socket.broadcast.emit('ready', { name: name });
+            socket.broadcast.emit('nickname set', { name: name });
         });
     });
 

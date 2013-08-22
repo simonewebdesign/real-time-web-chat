@@ -1,7 +1,7 @@
 
 /***** CLIENT *****/
 
-define(['emoticons', 'socket.io'], function(emoticons) {
+define(['emoticons', 'socket.io'], function (emoticons) {
 
     var messages = [],
         users = [],
@@ -16,22 +16,33 @@ define(['emoticons', 'socket.io'], function(emoticons) {
         notice = document.querySelector('.notice'),
         enableNotificationsButton = document.querySelector('.enable-notifications'),
 
+        // gets nickname from localStorage:
+        // return: string nickname, or null if nick hasn't been set yet.
         getNick = function() {
-            if (localStorage.getItem('name') === null) {
-                var _maxRandomInt = 99999,
-                    randomInt = Math.floor(Math.random()*_maxRandomInt+1),
-                    randomName = 'Guest' + randomInt;
+            return localStorage.getItem('name');                
                 localStorage.setItem('name', randomName);
             }
             return localStorage.getItem('name');
         },
 
-        setNick = function(nick){
-            if (nick != '' && nick != undefined && nick != null) {
+        // save nickname on localStorage
+        // return: true on success, false otherwise.
+        setNick = function (nick) {
+            if (nick !== '' && nick !== undefined && nick !== null) {
                 localStorage.setItem('name', nick);
-                return localStorage.getItem('name');
+                return true;
             }
             return false;
+        },
+
+        // generates a random nickname.
+        // useful when an unknown user connects for the first time.
+        // return: string random nick
+        generateNick = function() {
+            var _maxRandomInt = 99999,
+                randomInt = Math.floor(Math.random()*_maxRandomInt+1),
+                randomName = 'Guest' + randomInt;
+            return randomName;
         },
 
         message = function() {
@@ -53,7 +64,7 @@ define(['emoticons', 'socket.io'], function(emoticons) {
             }
         },
 
-        searchAndReplaceEmoticonsIn = function(message) {
+        searchAndReplaceEmoticonsIn = function (message) {
             // TODO msn
             for (var i=0; i<emoticons.skype.length; i++) {
 
@@ -118,7 +129,7 @@ define(['emoticons', 'socket.io'], function(emoticons) {
             field.value = "";
         },
 
-        printMessage = function(data) {
+        printMessage = function (data) {
 
             if (!data.text) {
                 return;
@@ -178,14 +189,21 @@ define(['emoticons', 'socket.io'], function(emoticons) {
 
     /***** server socket events *****/
 
-    socket.on('connected', function(data) {
+    socket.on('connected', function (data) {
         console.log('client connected.');
         console.log(data);
 
-        // set nickname
-        console.log('client: emitting set nickname');
-        socket.emit('set nickname', getNick());
-
+        // NICKNAME
+        var name = '';
+        // new user?
+        if (getNick() === null) {
+            // set nickname for the first time
+            name = generateNick();
+        } else {
+            // returning user
+            name = getNick();
+        }
+        socket.emit('set nickname', name);
         //printMessage({
         //    name: 'Server',
         //    text: data.name + '(' + data.id + ')' + ' is now online!',
@@ -194,7 +212,7 @@ define(['emoticons', 'socket.io'], function(emoticons) {
         //});
     });
 
-    socket.on('disconnected', function(data) {
+    socket.on('disconnected', function (data) {
         console.log('client disconnected. id: ' + data.id);
         printMessage({
             name: 'Server',
@@ -204,15 +222,29 @@ define(['emoticons', 'socket.io'], function(emoticons) {
         });
     });
 
-    socket.on('ready', function(data) {
-        console.log('ready: name is:' + data.name);
-        // NO sendMessage(), it won't work here.
-        printMessage({
-            name: 'Server',
-            text: data.name + ' is connected.',
-            type: 0,
-            time: (new Date()).getTime()
-        });
+    socket.on('nickname set', function (data) {
+
+        // new user?
+        if (getNick() === null) {
+
+            printMessage({
+                name: 'Server',
+                text: data.name + ' is connected.',
+                type: 0,
+                time: (new Date()).getTime()
+            });
+
+        } else {
+
+            printMessage({
+                name: 'Server',
+                text: getNick() ' changed his name to ' + data.name;
+                type: 0,
+                time: (new Date()).getTime(),
+            });
+        }
+
+        setNick(data.name);
     });
 
     socket.on('message', function (data) {
@@ -235,7 +267,7 @@ define(['emoticons', 'socket.io'], function(emoticons) {
 
             console.log('Permission is: ' + notification.permission);
 
-        } catch(exception) {
+        } catch (exception) {
            // Notifications not enabled or
            // browser does not support them.
            //console.log(exception);
@@ -243,7 +275,7 @@ define(['emoticons', 'socket.io'], function(emoticons) {
 
     });
 
-    socket.on('written', function(data) {
+    socket.on('written', function (data) {
 
         resetTimer();
 
@@ -258,7 +290,7 @@ define(['emoticons', 'socket.io'], function(emoticons) {
 
     /***** client-side event listeners *****/
 
-    sendButton.addEventListener('click', function(){
+    sendButton.addEventListener('click', function () {
 
         sendMessage(message());
         // alerts other users that this user is writing a message
@@ -266,7 +298,7 @@ define(['emoticons', 'socket.io'], function(emoticons) {
 
     }, false);
 
-    field.addEventListener('keyup', function(event){
+    field.addEventListener('keyup', function (event) {
 
         if (event.keyCode == 13) { // user pressed enter
             sendMessage(message());
@@ -276,7 +308,7 @@ define(['emoticons', 'socket.io'], function(emoticons) {
 
     }, false);
 
-    enableNotificationsButton.addEventListener('click', function(event) {
+    enableNotificationsButton.addEventListener('click', function (event) {
 
         console.log("button clicked, should now enable notifications");
 
