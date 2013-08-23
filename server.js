@@ -50,10 +50,8 @@ io.sockets.on('connection', function (socket) {
 
     socket.on('set nickname', function (user) {
         socket.set('nickname', user.newName, function () {
-            // FIXME even the user that has changed his name should be notified
-            console.log('PIPPO:');
-            console.log(user);
             socket.broadcast.emit('nickname set', user);
+            socket.emit('nickname set', user);
         });
     });
 
