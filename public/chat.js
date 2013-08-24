@@ -115,10 +115,14 @@ define(['emoticons', 'socket.io'], function (emoticons) {
             }
         },
 
+        // reads the field.value. if it's empty, it just does nothing.
+        // checks whether the field.value is a command. If so, it executes it.
+        // else it just searches for emoticons and finally it notifies the server
+        // that the user wants to send the message.
+        // it also clears the field.value (input tag).
         sendMessage = function (data) {
 
-            // FIXME a message won't be sent if it doesn't come from field.
-            if (field.value.trim() == '') {
+            if (data.text == '') {
                 return;
             }
             
