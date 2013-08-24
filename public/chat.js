@@ -88,7 +88,7 @@ define(['emoticons', 'socket.io'], function (emoticons) {
         // evaluates a command.
         // string command the command name.
         // array args the command arguments.
-        // return: void
+        // return: true on success, false otherwise.
         evaluateCommand = function (command, args) {
             // command name: nick
             // description: set a new nickname
@@ -111,8 +111,11 @@ define(['emoticons', 'socket.io'], function (emoticons) {
 
                     // update my nickname
                     setNick(name);
+
+                    return true;
                 }
             }
+            return false;
         },
 
         // reads the field.value. if it's empty, it just does nothing.
