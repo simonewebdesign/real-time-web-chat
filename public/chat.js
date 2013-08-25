@@ -248,12 +248,8 @@ define(['emoticons', 'socket.io'], function (emoticons) {
     /***** server socket events *****/
 
     socket.on('connected', function (data) {
-
-        //console.log('client connected.');
-        //console.log(data);
-
-        // First of all, let's set the nickname.
-        // NICKNAME
+        // First of all, let's recognize the user
+        // by getting his nickname.
         var user = {
             name: '',
             isNewish: false
@@ -270,12 +266,6 @@ define(['emoticons', 'socket.io'], function (emoticons) {
             user.isNewish = false;
         }
         socket.emit('recognizing user', user);
-        //printMessage({
-        //    name: 'Server',
-        //    text: data.name + '(' + data.id + ')' + ' is now online!',
-        //    type: 0,
-        //    time: (new Date()).getTime()
-        //});
     });
 
     socket.on('user recognized', function (user) {
