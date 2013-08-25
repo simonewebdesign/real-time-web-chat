@@ -8,7 +8,7 @@
         "jade": "latest",
         "underscore": "latest"
     },
-    "author": "developer",
+    "author": "Sim & Nic",
     "repository" : { 
         "type": "git",
         "url": "https://github.com/simonewebdesign/real-time-web-chat.git"
