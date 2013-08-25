@@ -16,6 +16,8 @@ define(['emoticons', 'socket.io'], function (emoticons) {
         notice = document.querySelector('.notice'),
         enableNotificationsButton = document.querySelector('.enable-notifications'),
 
+        cmdRegex = /^\/([a-z0-9_-]+)\s?([a-z0-9_-]+)?\s?([a-z0-9_-]+)?$/i,
+
         // gets nickname from localStorage:
         // return: string nickname, or null if nick hasn't been set yet.
         getNick = function() {
@@ -85,11 +87,36 @@ define(['emoticons', 'socket.io'], function (emoticons) {
             return message;
         },
 
+        // just tells us if the provided text is a command.
+        // return: true or false.
+        isCommand = function (text) {
+            return cmdRegex.test(text);
+        },
+
+        // get command name and arguments from the provided text.
+        // It assumes that the text is a command.
+        // You should call isCommand() before this.
+        // return: an object with the command name and its arguments.
+        getCommandFrom = function (text) {
+            var matches = cmdRegex.exec(text),
+                name = matches[1],
+                args = [
+                    matches[2], 
+                    matches[3]
+                ];
+
+            return {
+                name: name,
+                args: args
+            }
+        },
+
         // evaluates a command.
         // string command the command name.
         // array args the command arguments.
         // return: true on success, false otherwise.
-        evaluateCommand = function (command, args) {
+        evaluate = function (command, args) {
+
             // command name: nick
             // description: set a new nickname
             // usage: /nick <nickname>
@@ -114,6 +141,8 @@ define(['emoticons', 'socket.io'], function (emoticons) {
 
                     return true;
                 }
+            } else if (/foo/i.test(command)) {
+                alert(args[0]);
             }
             return false;
         },
@@ -123,25 +152,17 @@ define(['emoticons', 'socket.io'], function (emoticons) {
         // else it just searches for emoticons and finally it notifies the server
         // that the user wants to send the message.
         // it also clears the field.value (input tag).
-        sendMessage = function (data) {
+        send = function (data) {
 
             if (data.text == '') {
                 return;
             }
-            
-            var commandRegex = /^\/([a-z0-9_-]+)\s?([a-z0-9_-]+)?\s?([a-z0-9_-]+)?$/i,
-                isCommand = commandRegex.test(data.text);
 
-            if (isCommand) {
+            if (isCommand(data.text)) {
 
-                var matches = commandRegex.exec(data.text);
-                    command = matches[1],
-                    args = [matches[2], matches[3]];
-
-                evaluateCommand(command, args);
-
+                var command = getCommandFrom(data.text);
+                evaluate(command.name, command.args);
             } else {
-
                 searchAndReplaceEmoticonsIn(data);
                 socket.emit('send message', data);
             }
@@ -334,7 +355,7 @@ define(['emoticons', 'socket.io'], function (emoticons) {
 
     sendButton.addEventListener('click', function () {
 
-        sendMessage(message());
+        send(message());
         // alerts other users that this user is writing a message
         socket.emit('writing', message());
 
@@ -343,7 +364,7 @@ define(['emoticons', 'socket.io'], function (emoticons) {
     field.addEventListener('keyup', function (event) {
 
         if (event.keyCode == 13) { // user pressed enter
-            sendMessage(message());
+            send(message());
         }
         // alerts other users that this user is writing a message
         socket.emit('writing', message());
