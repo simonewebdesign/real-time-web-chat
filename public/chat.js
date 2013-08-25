@@ -143,6 +143,16 @@ define(['emoticons', 'socket.io'], function (emoticons) {
                 }
             } else if (/foo/i.test(command)) {
                 alert(args[0]);
+                return true;
+            } else {
+                // not a valid command
+                printMessage({
+                    name: 'Server',
+                    text: command + ' is not a valid command.',
+                    type: 0,
+                    time: (new Date()).getTime()                    
+                });
+                return false;
             }
             return false;
         },
@@ -162,6 +172,8 @@ define(['emoticons', 'socket.io'], function (emoticons) {
 
                 var command = getCommandFrom(data.text);
                 evaluate(command.name, command.args);
+                // maybe add here a socket.emit('execute command')
+                // where the evaluate() returns true.
             } else {
                 searchAndReplaceEmoticonsIn(data);
                 socket.emit('send message', data);

@@ -44,8 +44,9 @@ io.sockets.on('connection', function (socket) {
     socket.on('recognizing user', function (user) {
 
         socket.set('nickname', user.name, function () {
+            socket.broadcast.emit('user recognized', user);
             socket.emit('user recognized', user);
-        });        
+        });
     });
 
     socket.on('set nickname', function (user) {
