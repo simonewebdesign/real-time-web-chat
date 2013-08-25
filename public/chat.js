@@ -345,9 +345,10 @@ define(['emoticons', 'socket.io'], function (emoticons) {
 
         resetTimer();
 
-        if (data.text == '') {
+        if (data.text == '' || data.text.substring(0,1) == '/') {
+            // don't show any notices
             notice.innerHTML = ''; 
-        }else {
+        } else {
             notice.innerHTML = data.name + ' is writing...';
         }
     });
