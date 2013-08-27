@@ -6,7 +6,7 @@ define(['emoticons', 'socket.io'], function (emoticons) {
     var socket = io.connect('http://localhost:1337'),
         timer,
         delay = 3000,
-//        users = [],
+        writingUsers = [],
 //        messages = [],
 //        webNotificationsEnabled = false,        
 
@@ -231,17 +231,63 @@ define(['emoticons', 'socket.io'], function (emoticons) {
             content.appendChild(messageHTMLElement);
         },
 
-        // for the "user is writing..." feature
+        // generates the HTML element representing a notice, and prints it.
+        // object data the message to print.
+        // ...
+        // updates the innerHTML.
+        // users: an array of the users that are currently writing something.
         // return: void
-        resetTimer = function() {
+        printNotice = function (users) {
+            // create the HTML element
+            //var noticeHTMLElement = document.createElement('div');
+            //noticeHTMLElement.setAttribute('class', 'notice');
+            if (users.length < 1) {
+                notice.innerHTML = '';
+                return;
+            }
+
+            var noticeString = '';
+
+            for(i=0; i<users.length; i++) {
+                noticeString += users[i] + ', ';
+            }
+            if (users.length > 1) {
+                noticeString += 'are '; 
+            } else {
+                noticeString += 'is '; 
+            }
+            noticeString += 'writing...';
+
+            notice.innerHTML = noticeString;
+        }
+
+        // for the "user is writing..." feature
+        // string name: the name of who is currently writing a message.
+        // return: void
+        resetTimerForUser = function(name) {
             if (typeof timer != "undefined") {            
                 clearTimeout(timer);
                 timer = 0;
             }
 
             timer = setTimeout(function() {
-                notice.innerHTML = '';
-            }, delay);            
+                // removes an user because the time has expired
+                writingUsers.remove(name);
+                // redisplays the notice
+                printNotice(writingUsers);
+                
+            }, delay);
+        };
+
+        // Removes an element from an array.
+        // string value the value to search and remove from the array.
+        // return: an array with the removed element; false otherwise.
+        writingUsers.remove = function(value) {
+            var idx = this.indexOf(value);
+            if (idx != -1) {
+                return this.splice(idx, 1); // The second parameter of splice is the number of elements to remove.
+            }
+            return false;
         }
 
 
@@ -343,14 +389,25 @@ define(['emoticons', 'socket.io'], function (emoticons) {
 
     socket.on('written', function (data) {
 
-        resetTimer();
+        resetTimerForUser(data.name); // in the logic there is a remove too. It also redisplays notice
 
         if (data.text == '' || data.text.substring(0,1) == '/') {
             // don't show any notices
-            notice.innerHTML = ''; 
+            
+            // remove the user if it's in writingUsers
+            writingUsers.remove(data.name);
+
         } else {
-            notice.innerHTML = data.name + ' is writing...';
+            // add the user to writingUsers array, if it isn't in already
+            if (writingUsers.indexOf(data.name) == -1) {
+                writingUsers.push(data.name);
+            }
         }
+
+        //console.log(writingUsers);
+
+        // print writingUsers
+        printNotice(writingUsers);
     });
 
 
