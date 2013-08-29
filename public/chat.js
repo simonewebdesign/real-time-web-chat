@@ -1,14 +1,18 @@
 
 /***** CLIENT *****/
 
-define(['emoticons', 'socket.io'], function (emoticons) {
+define(['emoticons', 'timer', 'socket.io'], function (emoticons, Timer) {
+
+    //var timer = new Timer;
+    //console.log(timer);
 
     var socket = io.connect('http://localhost:1337'),
-        timer,
-        delay = 3000,
+//        timer,
+//        delay = 3000,
         writingUsers = [],
 //        messages = [],
 //        webNotificationsEnabled = false,        
+        timers = [],
 
         field = document.querySelector('.field'),
         sendButton = document.querySelector('.send'),
@@ -264,20 +268,20 @@ define(['emoticons', 'socket.io'], function (emoticons) {
         // for the "user is writing..." feature
         // string name: the name of who is currently writing a message.
         // return: void
-        resetTimerForUser = function(name) {
-            if (typeof timer != "undefined") {            
-                clearTimeout(timer);
-                timer = 0;
-            }
+//        resetTimerForUser = function(name) {
+//            if (typeof timer != "undefined") {            
+//                clearTimeout(timer);
+//                timer = 0;
+//            }
 
-            timer = setTimeout(function() {
+//            timer = setTimeout(function() {
                 // removes an user because the time has expired
-                writingUsers.remove(name);
+//                writingUsers.remove(name);
                 // redisplays the notice
-                printNotice(writingUsers);
+//                printNotice(writingUsers);
                 
-            }, delay);
-        };
+//            }, delay);
+//        };
 
         // Removes an element from an array.
         // string value the value to search and remove from the array.
@@ -336,6 +340,9 @@ define(['emoticons', 'socket.io'], function (emoticons) {
                 time: (new Date()).getTime()
             });
         }
+
+        // qua potenzialmente potremmo inizializzare un utente, ok?
+        // qua creiamo l'istanza del timer, che pero` non parte subito.
     });
 
     socket.on('nickname set', function (user) {
@@ -389,7 +396,47 @@ define(['emoticons', 'socket.io'], function (emoticons) {
 
     socket.on('written', function (data) {
 
-        resetTimerForUser(data.name); // in the logic there is a remove too. It also redisplays notice
+        // se non abbiamo un timer per l'utente che ha scritto,
+        // ne istanziamo uno subito.
+        // altrimenti,
+        // resettiamo quello che c'e' gia', di quel determinato utente
+
+        // dobbiamo avere un array di timers.
+        // ogni timer ha il suo id.
+
+//        var timers = [
+//            'pincopallino': [Timer object],
+//            'tiziocaio86': [Timer object]
+//        ]
+        console.log(timers);
+
+        if (timers[data.name]) {
+            timers[data.name].reset();
+        } else {
+            timers[data.name] = new Timer(function() {
+
+                console.log('timer has expired... 418');
+
+                // removes an user because the time has expired
+                writingUsers.remove(data.name);
+                // redisplays the notice
+                printNotice(writingUsers);
+
+                // maybe destroy the timer?
+                timers[data.name] = 0;
+            });
+
+            timers[data.name].start();
+        }
+
+//        if (user.timer.started) { //if timers.key exists
+//            user.timer.reset();
+//        } else {
+//            // start for the first time
+//            user.timer.start();
+//        }
+
+//        resetTimerForUser(data.name); // in the logic there is a remove too. It also redisplays notice
 
         if (data.text == '' || data.text.substring(0,1) == '/') {
             // don't show any notices
@@ -416,6 +463,10 @@ define(['emoticons', 'socket.io'], function (emoticons) {
     sendButton.addEventListener('click', function () {
 
         send(message());
+
+        // qua potremmo far partire il timer
+
+
         // alerts other users that this user is writing a message
         socket.emit('writing', message());
 
