@@ -3,21 +3,15 @@
 
 define(['emoticons', 'timer', 'socket.io'], function (emoticons, Timer) {
 
-    //var timer = new Timer;
-    //console.log(timer);
-
     var socket = io.connect('http://localhost:1337'),
-//        timer,
-//        delay = 3000,
-        writingUsers = [],
-//        messages = [],
-//        webNotificationsEnabled = false,        
+
+        writingUsers = [],        
         timers = [],
 
-        field = document.querySelector('.field'),
+        field =      document.querySelector('.field'),
         sendButton = document.querySelector('.send'),
-        content = document.querySelector('.messages'),
-        notice = document.querySelector('.notice'),
+        content =    document.querySelector('.messages'),
+        notice =     document.querySelector('.notice'),
         enableNotificationsButton = document.querySelector('.enable-notifications'),
 
         cmdRegex = /^\/([a-z0-9_-]+)\s?([a-z0-9_-]+)?\s?([a-z0-9_-]+)?$/i,
@@ -253,7 +247,14 @@ define(['emoticons', 'timer', 'socket.io'], function (emoticons, Timer) {
             var noticeString = '';
 
             for(i=0; i<users.length; i++) {
+
                 noticeString += users[i] + ', ';
+
+          //      if (users.length != 1 || i != users.length-1) {
+          //          noticeString += ', ';
+          //      } else {
+          //          noticeString += ' ';
+          //      }
             }
             if (users.length > 1) {
                 noticeString += 'are '; 
@@ -264,24 +265,6 @@ define(['emoticons', 'timer', 'socket.io'], function (emoticons, Timer) {
 
             notice.innerHTML = noticeString;
         }
-
-        // for the "user is writing..." feature
-        // string name: the name of who is currently writing a message.
-        // return: void
-//        resetTimerForUser = function(name) {
-//            if (typeof timer != "undefined") {            
-//                clearTimeout(timer);
-//                timer = 0;
-//            }
-
-//            timer = setTimeout(function() {
-                // removes an user because the time has expired
-//                writingUsers.remove(name);
-                // redisplays the notice
-//                printNotice(writingUsers);
-                
-//            }, delay);
-//        };
 
         // Removes an element from an array.
         // string value the value to search and remove from the array.
@@ -340,15 +323,10 @@ define(['emoticons', 'timer', 'socket.io'], function (emoticons, Timer) {
                 time: (new Date()).getTime()
             });
         }
-
-        // qua potenzialmente potremmo inizializzare un utente, ok?
-        // qua creiamo l'istanza del timer, che pero` non parte subito.
     });
 
     socket.on('nickname set', function (user) {
-
         // This is a received broadcast
-
         printMessage({
             name: 'Server',
             text: user.oldName + ' changed his name to ' + user.newName,
@@ -358,7 +336,7 @@ define(['emoticons', 'timer', 'socket.io'], function (emoticons, Timer) {
     });
 
     socket.on('disconnected', function (data) {
-        console.log('client disconnected. id: ' + data.id);
+        console.log(data.name + ' disconnected.');
         printMessage({
             name: 'Server',
             text: data.name + ' disconnected.',
@@ -395,33 +373,17 @@ define(['emoticons', 'timer', 'socket.io'], function (emoticons, Timer) {
     });
 
     socket.on('written', function (data) {
-
-        // se non abbiamo un timer per l'utente che ha scritto,
-        // ne istanziamo uno subito.
-        // altrimenti,
-        // resettiamo quello che c'e' gia', di quel determinato utente
-
-        // dobbiamo avere un array di timers.
-        // ogni timer ha il suo id.
-
-//        var timers = [
-//            'pincopallino': [Timer object],
-//            'tiziocaio86': [Timer object]
-//        ]
-        console.log(timers);
-
+        // if we don't have a timer for the user,
+        // we instantiate one on the fly.
+        // otherwise, we reset it.
         if (timers[data.name]) {
             timers[data.name].reset();
         } else {
             timers[data.name] = new Timer(function() {
-
-                console.log('timer has expired... 418');
-
                 // removes an user because the time has expired
                 writingUsers.remove(data.name);
                 // redisplays the notice
                 printNotice(writingUsers);
-
                 // maybe destroy the timer?
                 timers[data.name] = 0;
             });
@@ -429,18 +391,7 @@ define(['emoticons', 'timer', 'socket.io'], function (emoticons, Timer) {
             timers[data.name].start();
         }
 
-//        if (user.timer.started) { //if timers.key exists
-//            user.timer.reset();
-//        } else {
-//            // start for the first time
-//            user.timer.start();
-//        }
-
-//        resetTimerForUser(data.name); // in the logic there is a remove too. It also redisplays notice
-
         if (data.text == '' || data.text.substring(0,1) == '/') {
-            // don't show any notices
-            
             // remove the user if it's in writingUsers
             writingUsers.remove(data.name);
 
@@ -450,9 +401,6 @@ define(['emoticons', 'timer', 'socket.io'], function (emoticons, Timer) {
                 writingUsers.push(data.name);
             }
         }
-
-        //console.log(writingUsers);
-
         // print writingUsers
         printNotice(writingUsers);
     });
@@ -461,20 +409,15 @@ define(['emoticons', 'timer', 'socket.io'], function (emoticons, Timer) {
     /***** client-side event listeners *****/
 
     sendButton.addEventListener('click', function () {
-
+        // send it!
         send(message());
-
-        // qua potremmo far partire il timer
-
-
         // alerts other users that this user is writing a message
         socket.emit('writing', message());
-
     }, false);
 
     field.addEventListener('keyup', function (event) {
-
-        if (event.keyCode == 13) { // user pressed enter
+        // pressed enter
+        if (event.keyCode == 13) {
             send(message());
         }
         // alerts other users that this user is writing a message
