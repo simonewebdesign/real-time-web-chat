@@ -1,0 +1,19 @@
+!!!
+html
+  head
+    title='Real time web chat'
+    link(rel='stylesheet', href='css/normalize.css')
+    link(rel='stylesheet', href='css/style.css')
+
+  body
+    .content
+      .messages
+      .notice
+    .controls
+      input.field(placeholder='Send a message')
+      input.send(type='button', value='send')
+      //button.enable-notifications Enable desktop notifications
+
+
+    script(src='require.js')
+    script(src='main.js')

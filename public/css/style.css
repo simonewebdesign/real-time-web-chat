@@ -1,0 +1,86 @@
+div, input {
+  box-sizing: border-box;
+}
+
+html, body {
+  height: 100%;
+}
+
+body {
+  background-color: #aaa;
+  font-size: 12px;
+  font: 8pt/150% Tahoma, Helvetica, Arial, sans-serif;
+}
+
+input, button {
+  border: 0;
+}
+
+.content {
+  height:90%;
+
+  position: relative;
+  background-color: #ddd;
+
+  overflow-x: hidden;
+  overflow-y: scroll;  
+}
+  .content .notice {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    background-color: #efe;
+    width: 100%;
+  }
+
+  .content, .message, input.field {
+    padding: 5px;
+  }
+
+.controls {
+  height: 10%;
+  background-color: #546;
+}
+  .controls * {
+    height: 100%;
+  }
+  .controls input.field {
+    width:75%;
+  }
+
+.message {
+  background: #e5e5e5;
+}
+.message:nth-child(2n+1) {
+  background-color: #eee;
+}
+
+.message .text,
+.message .time {
+  float: left;
+}
+
+.message .name {}
+.message .text {
+  width: 80%;
+}
+
+.message .name {
+  color: #0078ca;
+}
+
+.message .time {
+  width:20%;
+  color: #999;
+  text-align: right;
+}
+
+/* from the html5boilerplate */
+.clearfix:before,
+.clearfix:after {
+    content: " ";
+    display: table;
+}
+.clearfix:after {
+    clear: both;
+}
