@@ -5,8 +5,7 @@
     "dependencies": {
         "socket.io": "latest",
         "express": "latest",
-        "jade": "latest",
-        "underscore": "latest"
+        "jade": "latest"
     },
     "author": "Sim & Nic",
     "repository" : { 
