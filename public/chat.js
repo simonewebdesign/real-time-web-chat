@@ -236,34 +236,22 @@ define(['emoticons', 'timer', 'socket.io'], function (emoticons, Timer) {
         // users: an array of the users that are currently writing something.
         // return: void
         printNotice = function (users) {
-            // create the HTML element
-            //var noticeHTMLElement = document.createElement('div');
-            //noticeHTMLElement.setAttribute('class', 'notice');
+
             if (users.length < 1) {
                 notice.innerHTML = '';
                 return;
             }
 
-            var noticeString = '';
-
-            for(i=0; i<users.length; i++) {
-
-                noticeString += users[i] + ', ';
-
-          //      if (users.length != 1 || i != users.length-1) {
-          //          noticeString += ', ';
-          //      } else {
-          //          noticeString += ' ';
-          //      }
-            }
+            var str = users.join(', ');
+            
             if (users.length > 1) {
-                noticeString += 'are '; 
+                str += ' are ';
             } else {
-                noticeString += 'is '; 
+                str += ' is ';
             }
-            noticeString += 'writing...';
+            str += 'writing...';
 
-            notice.innerHTML = noticeString;
+            notice.innerHTML = str;
         }
 
         // Removes an element from an array.
