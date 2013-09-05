@@ -123,6 +123,12 @@ var SampleApp = function() {
             res.set('Content-Type', 'text/html');
             res.send(self.cache_get('index.html') );
         };
+
+        // another test route
+        self.routes['/foo'] = function(req, res){
+            res.send("It works!");
+        };
+
     };
 
 
