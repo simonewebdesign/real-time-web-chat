@@ -11,6 +11,11 @@ var io = require('socket.io').listen(app.listen(port));
 
 io.sockets.on('connection', function (socket) { // socket is the client's socket, the junction between the server and the user's browser.
 
+    // Quick reference:
+//    socket.emit(): emits to you only.
+//    socket.broadcast.emit(): emits to all, but not you.
+//    io.sockets.emit(): emits to all sockets.
+
     socket.emit('connected', { id: socket.id });
 
     socket.on('recognizing user', function (user) {
@@ -37,7 +42,9 @@ io.sockets.on('connection', function (socket) { // socket is the client's socket
 
     socket.on('send message', function (data) {
         // forward the data sent by the user to all other sockets
-        io.sockets.emit('message sent', data);
+        io.sockets.emit('message', data);
+        // Note: io.sockets.emit() !== socket.emit()
+        // In theory it should be like sending a broadcast and a socket.emit.
     });
 
     socket.on('disconnect', function () {

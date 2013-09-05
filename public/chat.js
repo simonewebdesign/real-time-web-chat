@@ -252,6 +252,37 @@ define(['emoticons', 'timer', 'socket.io'], function (emoticons, Timer) {
             str += 'writing...';
 
             notice.innerHTML = str;
+        },
+
+        // Scroll to the bottom if user is in the viewport.
+        // return: void
+        maybeScrollToBottom = function () {
+            var content = document.querySelector('.content');
+     
+            // scrollTop gets or sets the number of pixels
+            // that the content of an element is scrolled upward.
+            //console.log('scrollTop:    ' + content.scrollTop);
+     
+            // scrollHeight is the height of the scroll view of an element (in other words, the whole content's height); it includes the element padding but not its margin.
+            //console.log('scrollHeight: ' + content.scrollHeight);
+     
+            // offsetHeight is the height of an element relative to the element's offsetParent. In other words, it's the viewport, and it's constant.
+            //console.log('offsetHeight: ' + content.offsetHeight);
+            // Warning: clientHeight is the same, but you shouldn't use it, because it's not part of any W3C specification.
+     
+            // offsetParent returns a reference to the object which is the closest (nearest in the containment hierarchy) positioned containing element.
+            // I actually don't need this.
+            //console.log(content.offsetParent);
+     
+            // maxScrollTop is the maximum value scrollTop can assume.
+            content.maxScrollTop = content.scrollHeight - content.offsetHeight;
+
+            if (content.maxScrollTop - content.scrollTop <= content.offsetHeight) {
+                // setting scrollTop to a high number will bring us to the bottom.
+                // setting its value to scrollHeight seems a good idea, because
+                // scrollHeight is always higher than scrollTop.
+                content.scrollTop = content.scrollHeight;
+            }
         }
 
         // Removes an element from an array.
@@ -333,31 +364,33 @@ define(['emoticons', 'timer', 'socket.io'], function (emoticons, Timer) {
         });
     });
 
-    socket.on('message sent', function (data) {
+    socket.on('message', function (data) {
         // add the message to messages
         // messages.push(data);
 
         // print it!
         printMessage(data);
 
+        maybeScrollToBottom();
+
         // notifications
-//        try {
-//
-//            notification = new Notification(data.name, {
-//               body: data.text,
-//               dir: 'auto',
-//               lang: 'en',
-//               tag: 'test',
-//               icon: 'https://0.gravatar.com/avatar/70034fa76ec3ada7dc95ecb8dc01f74f&s=420'
-//            });
-//
-//            console.log('Permission is: ' + notification.permission);
-//
-//        } catch (exception) {
-//           // Notifications not enabled or
-//           // browser does not support them.
-//           //console.log(exception);
-//        }
+        //        try {
+        //
+        //            notification = new Notification(data.name, {
+        //               body: data.text,
+        //               dir: 'auto',
+        //               lang: 'en',
+        //               tag: 'test',
+        //               icon: 'https://0.gravatar.com/avatar/70034fa76ec3ada7dc95ecb8dc01f74f&s=420'
+        //            });
+        //
+        //            console.log('Permission is: ' + notification.permission);
+        //
+        //        } catch (exception) {
+        //           // Notifications not enabled or
+        //           // browser does not support them.
+        //           //console.log(exception);
+        //        }
     });
 
     socket.on('written', function (data) {
