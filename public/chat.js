@@ -3,7 +3,10 @@
 
 define(['emoticons', 'socket.io'], function (emoticons) {
 
-    var socket = io.connect('http://127.0.0.1:8080'),
+    var ip = '127.0.0.1',
+        port = 1337,
+        fullIpAddress = 'http://' + ip + ':' + 1337,
+        socket = io.connect(fullIpAddress),
         timer,
         delay = 3000,
 //        users = [],
