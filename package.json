@@ -1,16 +1,35 @@
 {
-    "name": "RealTimeWebChat",
-    "version": "0.8.3",
-    "description": "Real time web chat",
-    "dependencies": {
-        "socket.io": "latest",
-        "express": "latest",
-        "jade": "latest",
-        "underscore": "latest"
-    },
-    "author": "Sim & Nic",
-    "repository" : { 
-        "type": "git",
-        "url": "https://github.com/simonewebdesign/real-time-web-chat.git"
-    }
+  "name": "OpenShift-Sample-App",
+  "version": "1.0.0",
+  "description": "OpenShift Sample Application",
+  "keywords": [
+    "OpenShift",
+    "Node.js",
+    "application",
+    "openshift"
+  ],
+  "author": {
+    "name": "OpenShift",
+    "email": "ramr@example.org",
+    "url":  "http://openshift.redhat.com/"
+  },
+  "homepage": "http://openshift.redhat.com/",
+  "repository": {
+    "type": "git",
+    "url": "https://gitub.com/openshift/crankcase"
+  },
+
+  "engines": {
+    "node": ">= 0.6.0",
+    "npm": ">= 1.0.0"
+  },
+
+  "dependencies": {
+    "express": "*"
+  },
+  "devDependencies": {},
+  "bundleDependencies": [],
+
+  "private": true,
+  "main": "server.js"
 }
