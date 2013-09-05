@@ -84,6 +84,10 @@ var SampleApp = function() {
         });
     };
 
+    self.setTemplateEngine = function() {
+
+    };
+
 
     /*  ================================================================  */
     /*  App server functions (main app logic here).                       */
@@ -126,7 +130,7 @@ var SampleApp = function() {
 
         // another test route
         self.routes['/foo'] = function(req, res){
-            res.send("It works!");
+            res.render('page'); // page.jade is our template
         };
 
     };
@@ -140,10 +144,18 @@ var SampleApp = function() {
         self.createRoutes();
         self.app = express();
 
+        // Use Jade with ExpressJS (mine)
+        self.app.set('views', __dirname + '/tpl');
+        self.app.set('view engine', 'jade');
+        self.app.engine('jade', require('jade').__express);
+
         //  Add handlers for the app (from the routes).
         for (var r in self.routes) {
             self.app.get(r, self.routes[r]);
         }
+
+        // mine
+        self.app.use(express.static(__dirname + '/public'));
     };
 
 
