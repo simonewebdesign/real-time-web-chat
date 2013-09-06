@@ -33,5 +33,5 @@
   "bundleDependencies": [],
 
   "private": true,
-  "main": "server.js"
+  "main": "server.js --websocket-port=8000 --log-level=3"
 }
