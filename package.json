@@ -25,7 +25,7 @@
   },
 
   "dependencies": {
-    "socket.io": "latest",
+    "socket.io": "0.9.16",
     "express": "*",
     "jade": "latest"
   },
@@ -33,5 +33,5 @@
   "bundleDependencies": [],
 
   "private": true,
-  "main": "server.js --websocket-port=8000 --log-level=3"
+  "main": "server.js"
 }
