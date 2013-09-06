@@ -142,7 +142,7 @@ var SampleApp = function() {
      */
     self.initializeServer = function() {
         self.createRoutes();
-        self.app = express();
+        self.app = express().listen(self.port);
 
         // Use Jade with ExpressJS (mine)
         self.app.set('views', __dirname + '/tpl');
@@ -186,7 +186,7 @@ var SampleApp = function() {
 //        });
 
     // We pass the express server to socket.io
-    io = require('socket.io').listen(self.app.listen(self.port));
+    io = require('socket.io').listen(self.app);
 
     io.sockets.on('connection', function (socket) { // socket is the client's socket, the junction between the server and the user's browser.
 
