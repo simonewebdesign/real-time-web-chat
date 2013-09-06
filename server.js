@@ -2,7 +2,7 @@
 //  OpenShift sample Node application
 var express = require('express');
 var fs      = require('fs');
-var io = null;
+var io;
 
 /**
  *  Define the sample application.
@@ -142,7 +142,7 @@ var SampleApp = function() {
      */
     self.initializeServer = function() {
         self.createRoutes();
-        self.app = express().listen(self.port);
+        self.app = express();
 
         // Use Jade with ExpressJS (mine)
         self.app.set('views', __dirname + '/tpl');
@@ -155,10 +155,7 @@ var SampleApp = function() {
         }
 
         // mine
-        self.app.use(express.static(__dirname + '/public'));
-
-
-               
+        self.app.use(express.static(__dirname + '/public'));               
     };
 
 
@@ -186,7 +183,7 @@ var SampleApp = function() {
 //        });
 
     // We pass the express server to socket.io
-    io = require('socket.io').listen(self.app);
+    io = require('socket.io').listen(self.app.listen(self.port));
 
     io.sockets.on('connection', function (socket) { // socket is the client's socket, the junction between the server and the user's browser.
 
