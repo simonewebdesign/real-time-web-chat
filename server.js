@@ -186,7 +186,7 @@ var SampleApp = function() {
 //        });
 
     // We pass the express server to socket.io
-    io = require('socket.io').listen(self.port);
+    io = require('socket.io').listen(self.ipaddress, self.port);
 
     io.sockets.on('connection', function (socket) { // socket is the client's socket, the junction between the server and the user's browser.
 
