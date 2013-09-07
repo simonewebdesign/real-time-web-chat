@@ -182,50 +182,50 @@ var SampleApp = function() {
 //                        Date(Date.now() ), self.ipaddress, self.port);
 //        });
 
-    // We pass the express server to socket.io
-    io = require('socket.io').listen(self.app.listen(self.port));
+        // We pass the express server to socket.io
+        io = require('socket.io').listen(self.app.listen(self.port, self.ipaddress, function() {
+                console.log('%s: Node server started on %s:%d ...',
+                            Date(Date.now() ), self.ipaddress, self.port);
+            });
 
-    io.sockets.on('connection', function (socket) { // socket is the client's socket, the junction between the server and the user's browser.
+        io.sockets.on('connection', function (socket) { // socket is the client's socket, the junction between the server and the user's browser.
 
-        socket.emit('connected', { id: socket.id });
+            socket.emit('connected', { id: socket.id });
 
-        socket.on('recognizing user', function (user) {
+            socket.on('recognizing user', function (user) {
 
-            socket.set('nickname', user.name, function () {
-                socket.broadcast.emit('user recognized', user);
-                socket.emit('user recognized', user);
+                socket.set('nickname', user.name, function () {
+                    socket.broadcast.emit('user recognized', user);
+                    socket.emit('user recognized', user);
+                });
+            });
+
+            socket.on('set nickname', function (user) {
+                socket.set('nickname', user.newName, function () {
+                    socket.broadcast.emit('nickname set', user);
+                    socket.emit('nickname set', user);
+                });
+            });
+
+            socket.on('writing', function (data) {
+                // To broadcast, simply add a `broadcast` flag to `emit`
+                // and `send` method calls. Broadcasting means sending a
+                // message to everyone else except for the socket that starts it.
+                this.broadcast.emit('written', data);
+            });
+
+            socket.on('send message', function (data) {
+                // forward the data sent by the user to all other sockets
+                io.sockets.emit('message sent', data);
+            });
+
+            socket.on('disconnect', function () {
+
+                socket.get('nickname', function(err, name) {
+                    socket.broadcast.emit('disconnected', { name: name });
+                });
             });
         });
-
-        socket.on('set nickname', function (user) {
-            socket.set('nickname', user.newName, function () {
-                socket.broadcast.emit('nickname set', user);
-                socket.emit('nickname set', user);
-            });
-        });
-
-        socket.on('writing', function (data) {
-            // To broadcast, simply add a `broadcast` flag to `emit`
-            // and `send` method calls. Broadcasting means sending a
-            // message to everyone else except for the socket that starts it.
-            this.broadcast.emit('written', data);
-        });
-
-        socket.on('send message', function (data) {
-            // forward the data sent by the user to all other sockets
-            io.sockets.emit('message sent', data);
-        });
-
-        socket.on('disconnect', function () {
-
-            socket.get('nickname', function(err, name) {
-                socket.broadcast.emit('disconnected', { name: name });
-            });
-        });
-    });
-
-    console.log('%s: Node server (with socket.io) started on %s:%d ...',
-        Date(Date.now() ), self.ipaddress, self.port);
 
     };
 
