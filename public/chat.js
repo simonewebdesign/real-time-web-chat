@@ -3,7 +3,7 @@
 
 define(['emoticons', 'timer', 'socket.io'], function (emoticons, Timer) {
 
-    var socket = io.connect('http://localhost:1337'),
+    var socket = io.connect('http://' + document.location.host),
 
         writingUsers = [],        
         timers = [],
