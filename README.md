@@ -1,69 +1,94 @@
-Running a custom/latest Node[.js] version on RedHat's OpenShift PaaS
-====================================================================
-This git repository is a sample Node application along with the
-"orchestration" bits to help you run the latest or a custom version
-of Node on RedHat's OpenShift PaaS.
+# RTC - Real Time Chat
+
+Crafted with NodeJS, ExpressJS and Socket.io.
+
+## Getting started
+
+[Download the application](https://github.com/simonewebdesign/real-time-web-chat/archive/master.zip), or clone the repository:
+
+`$ git clone https://github.com/simonewebdesign/real-time-web-chat.git rtwc`
+
+Go into the folder and start the server:
+
+```
+$ cd rtwc
+$ npm start
+```
+
+Repo layout
+-----------
+
+| File/Folder                         | Description                            |
+| ---------------------------------   | -------------------------------------- |
+| node_modules/                       | Any Node modules packaged with the app |
+| package.json                        | npm package descriptor                 |
+| .openshift/                         | Openshift specific files               |
+| .openshift/action_hooks/pre_build   | Script that gets run every git push before the build
+| .openshift/action_hooks/build       | Script that gets run every git push as part of the build process (on the CI system if available)
+| .openshift/action_hooks/deploy      | Script that gets run every git push after build but before the app is restarted
+| .openshift/action_hooks/post_deploy | Script that gets run every git push after the app is restarted
 
 
-Selecting a Node version to install/use
----------------------------------------
+Notes about layout
+------------------
+Please leave the `node_modules` and `.openshift` directories but feel free to
+create additional directories if needed.
 
-To select the version of Node.js that you want to run, just edit or add
-a version to the .openshift/markers/NODEJS_VERSION file.
-
-    Example: To install Node.js version 0.9.1, you can run:
-       $ echo -e "0.9.1\n" >> .openshift/markers/NODEJS_VERSION
-
-
-The action_hooks in this application will use that NODEJS_VERSION marker
-file to download and extract that Node version if it is available on
-nodejs.org and will automatically set the paths up to use the node/npm
-binaries from that install directory.
-
-     See: .openshift/action_hooks/ for more details.
-
-    Note: The last non-blank line in the .openshift/markers/NODEJS_VERSION
-          file.determines the version it will install.
+*Note*: Every time you push, everything in your remote repo dir gets recreated. Please store long term items (like an sqlite database) in the OpenShift data directory, which will persist between pushes of your repo.
+The OpenShift data directory is accessible relative to the remote repo directory (../data) or via an environment variable `OPENSHIFT_DATA_DIR`.
 
 
-Okay, now onto how can you get a custom Node.js version running
-on OpenShift.
+Environment Variables
+---------------------
+OpenShift provides several environment variables to reference for ease
+of use.  The following list are some common variables but far from exhaustive:
+
+    process.env.OPENSHIFT_GEAR_NAME  - Application name
+    process.env.OPENSHIFT_GEAR_DIR   - Application dir
+    process.env.OPENSHIFT_DATA_DIR  - For persistent storage (between pushes)
+    process.env.OPENSHIFT_TMP_DIR   - Temp storage (unmodified files deleted after 10 days)
+
+When embedding a database using 'rhc app cartridge add', you can reference environment
+variables for username, host and password:
+
+    process.env.OPENSHIFT_DB_HOST      - DB Host
+    process.env.OPENSHIFT_DB_PORT      - DB Port
+    process.env.OPENSHIFT_DB_USERNAME  - DB Username
+    process.env.OPENSHIFT_DB_PASSWORD  - DB Password
+
+When embedding a NoSQL database using 'rhc app cartridge add', you can reference environment
+variables for username, host and password:
+
+    process.env.OPENSHIFT_NOSQL_DB_HOST      - NoSQL DB Host
+    process.env.OPENSHIFT_NOSQL_DB_PORT      - NoSQL DB Port
+    process.env.OPENSHIFT_NOSQL_DB_USERNAME  - NoSQL DB Username
+    process.env.OPENSHIFT_NOSQL_DB_PASSWORD  - NoSQL DB Password
+
+To get a full list of environment variables, simply add a line in your
+`.openshift/action_hooks/build` script that says "export" and push.
 
 
-Steps to get a custom Node.js version running on OpenShift
-----------------------------------------------------------
+### List of globally installed and available npm modules
 
-Create an account at http://openshift.redhat.com/
+#### DB drivers:
+- mongodb
+- mysql
+- pg
 
-Create a namespace, if you haven't already do so
+#### Other modules (including frameworks, middleware etc):
+- async
+- connect
+- express
+- formidable
+- generic-pool
+- hashish
+- mime
+- mkdirp
+- node-static
+- qs
+- traverse
 
-    rhc domain create <yournamespace>
 
-Create a nodejs-0.6 application (you can name it anything via -a)
+--
 
-    rhc app create -a palinode  -t nodejs-0.6
-
-Add this `github nodejs-custom-version-openshift` repository
-
-    cd palinode
-    git remote add upstream -m master git://github.com/openshift/nodejs-custom-version-openshift.git
-    git pull -s recursive -X theirs upstream master
-
-Optionally, specify the custom version of Node.js you want to run with
-(Default is v0.8.9).
-If you want to more later version of Node (example v0.9.1), you can change
-to that by just writing it to the end of the NODEJS_VERSION file and
-committing that change.
-
-    echo "0.9.1" >> .openshift/markers/NODEJS_VERSION
-    git commit . -m 'use Node version 0.9.1'
-
-Then push the repo to OpenShift
-
-    git push
-
-That's it, you can now checkout your application at:
-
-    http://palinode-$yournamespace.rhcloud.com
-    ( See env @ http://palinode-$yournamespace.rhcloud.com/env )
-
+This application is Open Source software released under the [MIT license](http://opensource.org/licenses/MIT). Kudos to [Nettuts+](http://net.tutsplus.com/tutorials/javascript-ajax/real-time-chat-with-nodejs-socket-io-and-expressjs/) and [OpenShift](https://www.openshift.com/).
