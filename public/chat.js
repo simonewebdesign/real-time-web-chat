@@ -160,6 +160,7 @@ define(['emoticons', 'timer', 'socket.io'], function (emoticons, Timer) {
                     type: 0,
                     time: (new Date()).getTime()                    
                 });
+                maybeScrollToBottom();                
                 return false;
             }
             return false;
@@ -352,8 +353,6 @@ define(['emoticons', 'timer', 'socket.io'], function (emoticons, Timer) {
                 type: 0,
                 time: (new Date()).getTime()
             });
-            // and save the nickname on client-side
-            // setNick(user.name);
 
         } else {
             // print a welcome back message
@@ -364,6 +363,9 @@ define(['emoticons', 'timer', 'socket.io'], function (emoticons, Timer) {
                 time: (new Date()).getTime()
             });
         }
+
+        maybeScrollToBottom();
+
     });
 
     socket.on('nickname set', function (user) {
@@ -374,16 +376,18 @@ define(['emoticons', 'timer', 'socket.io'], function (emoticons, Timer) {
             type: 0,
             time: (new Date()).getTime(),
         });
+        maybeScrollToBottom();        
     });
 
     socket.on('disconnected', function (data) {
-        console.log(data.name + ' disconnected.');
+
         printMessage({
             name: 'Server',
             text: data.name + ' disconnected.',
             type: 0,
             time: (new Date()).getTime()
         });
+        maybeScrollToBottom();        
     });
 
     socket.on('message', function (data) {
@@ -392,7 +396,6 @@ define(['emoticons', 'timer', 'socket.io'], function (emoticons, Timer) {
 
         // print it!
         printMessage(data);
-
         maybeScrollToBottom();
 
         // notifications
