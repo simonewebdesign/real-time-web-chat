@@ -345,25 +345,15 @@ define(['emoticons', 'timer', 'socket.io'], function (emoticons, Timer) {
 
     socket.on('user recognized', function (user) {
 
-        if (user.isNewish) {
-            // print a welcome message
-            printMessage({
-                name: 'Server',
-                text: user.name + ' is connected. Welcome!',
-                type: 0,
-                time: (new Date()).getTime()
-            });
+        var welcomeMessage = {
+            name: 'Server',
+            text: user.name + ' has joined the chat. ',
+            type: 0,
+            time: (new Date()).getTime()
+        };
 
-        } else {
-            // print a welcome back message
-            printMessage({
-                name: 'Server',
-                text: 'Welcome back, ' + user.name + '!',
-                type: 0,
-                time: (new Date()).getTime()
-            });
-        }
-
+        welcomeMessage.text += user.isNewish ? 'Welcome!' : 'Welcome back!';
+        printMessage(welcomeMessage);
         maybeScrollToBottom();
 
     });
