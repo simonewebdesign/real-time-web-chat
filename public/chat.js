@@ -25,8 +25,20 @@ define(['emoticons', 'timer', 'socket.io'], function (emoticons, Timer) {
         // save nickname on localStorage
         // return: true on success, false otherwise.
         setNick = function (nick) {
-            if (nick !== '' && nick !== undefined && nick !== null) {
+            if (nick !== '' && nick !== undefined && nick !== null) { // TODO not necessary!
                 localStorage.setItem('name', nick);
+                return true;
+            }
+            return false;
+        },
+
+        getId = function() {
+            return localStorage.getItem('id');
+        },
+
+        setId = function(id) {
+            if (id) {
+                localStorage.setItem('id', id);
                 return true;
             }
             return false;
@@ -46,19 +58,17 @@ define(['emoticons', 'timer', 'socket.io'], function (emoticons, Timer) {
         // return: object the message
         message = function() {
 
-            var name = getNick(),
+            var id   = getId(),
+                name = getNick(),
                 text = field.value.trim(),
                 type = 1,
                 time = (new Date()).getTime();
 
             return {
-                // nome di chi l'ha spedito
+                id:   id,
                 name: name,
-                // testo del messaggio
                 text: text,
-                // tipo di messaggio (NORMAL, SYSTEM, SCREAM?)
                 type: type,
-                // timestamp
                 time: time
             }
         },
@@ -206,6 +216,10 @@ define(['emoticons', 'timer', 'socket.io'], function (emoticons, Timer) {
             var nicknameHTMLElement = document.createElement('b');
             nicknameHTMLElement.innerHTML = data.name;
 
+            // id
+            var idHTMLElement = document.createElement('span');
+            idHTMLElement.innerHTML = data.id;
+
             // text
             var textHTMLElement = document.createElement('span');
             textHTMLElement.innerHTML = data.text;
@@ -217,6 +231,7 @@ define(['emoticons', 'timer', 'socket.io'], function (emoticons, Timer) {
 
             // append elements to the wrappers
             nicknameWrapperHTMLElement.appendChild(nicknameHTMLElement);
+            nicknameWrapperHTMLElement.appendChild(idHTMLElement);
             textWrapperHTMLElement.appendChild(textHTMLElement);
             timeWrapperHTMLElement.appendChild(timeHTMLElement);
 
@@ -300,22 +315,29 @@ define(['emoticons', 'timer', 'socket.io'], function (emoticons, Timer) {
     /***** server socket events *****/
 
     socket.on('connected', function (data) {
-        // First of all, let's recognize the user
-        // by getting his nickname.
+
+        // First of all, let's recognize the user.
         var user = {
-            name: '',
-            isNewish: false
+            id: data.id
         };
-        // new user?
-        if (getNick() === null) {
+
+        // store Socket ID in client, for later use
+        setId(data.id);
+
+        if (getNick()) { // returning user
+
+            user.name = getNick();
+            user.isNewish = false;
+
+        } else { // new user
+
             // set nickname for the first time
             user.name = generateNick();
             user.isNewish = true;
+
+            // and save it client-side
             setNick(user.name);
-        } else {
-            // returning user
-            user.name = getNick();
-            user.isNewish = false;
+
         }
         socket.emit('recognizing user', user);
     });
@@ -331,7 +353,7 @@ define(['emoticons', 'timer', 'socket.io'], function (emoticons, Timer) {
                 time: (new Date()).getTime()
             });
             // and save the nickname on client-side
-            setNick(user.name);
+            // setNick(user.name);
 
         } else {
             // print a welcome back message

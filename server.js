@@ -185,14 +185,26 @@ var SampleApp = function() {
 
         io.sockets.on('connection', function (socket) { // socket is the client's socket, the junction between the server and the user's browser.
 
-            socket.emit('connected', { id: socket.id });
-            console.log('Socket connected. ID: %s - %s', socket.id, new Date());
+            //  Socket.io cheat sheet:
+            //    socket.emit()             emits to you only.
+            //    socket.broadcast.emit()   emits to all, but not you.
+            //    io.sockets.emit()         emits to all sockets.
 
+            // 1) Every time a client connects, 
+            //    we send the Socket ID to him.
+            socket.emit('connected', {id: socket.id});
+            console.log("Socket with ID %s connected on %s", 
+                socket.id, new Date());
+
+            // 2) Let's see if the user is newish.
             socket.on('recognizing user', function (user) {
-                socket.set('nickname', user.name, function () {
-                    socket.broadcast.emit('user recognized', user);
-                    socket.emit('user recognized', user);
-                });
+
+                if (user.isNewish) {
+                    socket.set('nickname', user.name);
+                }
+                
+                io.sockets.emit('user recognized', user);
+
             });
 
             socket.on('set nickname', function (user) {
