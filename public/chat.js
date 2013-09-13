@@ -16,16 +16,16 @@ define(['emoticons', 'timer', 'socket.io'], function (emoticons, Timer) {
 
         cmdRegex = /^\/([a-z0-9_-]+)\s?([a-z0-9_-]+)?\s?([a-z0-9_-]+)?$/i,
 
-        // gets nickname from localStorage:
+        // gets nickname from localStorage.
         // return: string nickname, or null if nick hasn't been set yet.
         getNick = function() {
             return localStorage.getItem('name');
         },
 
-        // save nickname on localStorage
+        // save nickname on localStorage.
         // return: true on success, false otherwise.
         setNick = function (nick) {
-            if (nick !== '' && nick !== undefined && nick !== null) { // TODO not necessary!
+            if (nick) {
                 localStorage.setItem('name', nick);
                 return true;
             }
@@ -132,7 +132,7 @@ define(['emoticons', 'timer', 'socket.io'], function (emoticons, Timer) {
 
                 var name = args[0];
 
-                if (name !== undefined && name !== '') {
+                if (name) {
 
                     // name is certainly valid because the command regex has
                     // already validated it.
