@@ -186,6 +186,7 @@ var SampleApp = function() {
         io.sockets.on('connection', function (socket) { // socket is the client's socket, the junction between the server and the user's browser.
 
             socket.emit('connected', { id: socket.id });
+            console.log('Socket connected. ID: %s - %s', socket.id, new Date());
 
             socket.on('recognizing user', function (user) {
                 socket.set('nickname', user.name, function () {
@@ -217,7 +218,11 @@ var SampleApp = function() {
 
             socket.on('disconnect', function () {
                 socket.get('nickname', function(err, name) {
-                    socket.broadcast.emit('disconnected', { name: name });
+                    socket.broadcast.emit('disconnected', {
+                        id: socket.id,
+                        name: name 
+                    });
+                    console.log("%s (%s) disconnected. %s", name, socket.id, new Date());
                 });
             });
         });
