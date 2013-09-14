@@ -1,4 +1,6 @@
 div, input {
+  -moz-box-sizing:border-box;
+  -webkit-box-sizing:border-box;  
   box-sizing: border-box;
 }
 
@@ -8,8 +10,9 @@ html, body {
 
 body {
   background-color: #aaa;
-  font-size: 12px;
+  font-size: 12px;  
   font: 8pt/150% Tahoma, Helvetica, Arial, sans-serif;
+  overflow: hidden;
 }
 
 input, button {
@@ -17,7 +20,7 @@ input, button {
 }
 
 .content {
-  height:90%;
+  height:80%;
 
   position: relative;
   background-color: #ddd;
@@ -25,28 +28,31 @@ input, button {
   overflow-x: hidden;
   overflow-y: scroll;  
 }
-  .content .notice {
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    background-color: #efe;
-    width: 100%;
-  }
-
-  .content, .message, input.field {
-    padding: 5px;
-  }
+.notice {
+  background-color: #546; /* purple */
+  color: white;
+  height: 10%;
+}
 
 .controls {
+  position: relative;  
   height: 10%;
-  background-color: #546;
 }
-  .controls * {
+  .controls input {
     height: 100%;
   }
   .controls input.field {
-    width:75%;
+    width: 80%;
   }
+  .controls input.send {
+    width: 20%;
+  }
+
+.content,
+.message,
+input.field {
+  padding: 5px;
+}
 
 .message {
   background: #e5e5e5;
@@ -68,6 +74,17 @@ input, button {
 .message .name {
   color: #0078ca;
 }
+  .message .name b { /* nickname */
+
+  }
+  .message .name span { /* socket id */
+    color: #999;
+    padding-left: 10px;
+    font-size: 0.750em;
+  }
+  .message .name span:before {
+    content: 'id: ';
+  }
 
 .message .time {
   width:20%;
@@ -84,3 +101,8 @@ input, button {
 .clearfix:after {
     clear: both;
 }
+
+@media only screen and (min-width:320px)  { body{font-size:1.333em; /* 16px */} }
+@media only screen and (min-width:768px)  { body{font-size:1.167em; /* 14px */} }
+@media only screen and (min-width:1024px) { body{font-size:1em; /* 12px */} }
+@media only screen and (min-width:1900px) { body{font-size:1.500em; /* 18px */} }
