@@ -51,7 +51,7 @@ input, button {
 .content,
 .message,
 .notice,
-input.field,
+input.field
 {
   padding: 5px;
 }
