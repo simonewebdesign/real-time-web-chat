@@ -24,7 +24,7 @@ var SampleApp = function() {
         //  Set the environment variables we need.
         self.appname = process.env.OPENSHIFT_APP_NAME || 'rtwc';
         self.ipaddress = process.env.OPENSHIFT_INTERNAL_IP || process.env.OPENSHIFT_NODEJS_IP;
-        self.port = process.env.OPENSHIFT_INTERNAL_PORT || process.env.OPENSHIFT_NODEJS_PORT || 8081;
+        self.port = process.env.OPENSHIFT_INTERNAL_PORT || process.env.OPENSHIFT_NODEJS_PORT || 8082;
         self.dbport = process.env.OPENSHIFT_MONGODB_DB_PORT || 27017;
         self.dbname = self.appname;
 
@@ -36,15 +36,20 @@ var SampleApp = function() {
         };
 
         // default to a 'localhost' configuration:
-        self.connection_string = self.ipaddress + ':' + self.dbport + '/' + self.dbname;
+        //self.connection_string = self.ipaddress + ':' + self.dbport + '/' + self.dbname;
         // if OPENSHIFT env variables are present, use the available connection info:
         if (process.env.OPENSHIFT_MONGODB_DB_PASSWORD) {
+          console.log("We are in OpenShift");
           self.connection_string = process.env.OPENSHIFT_MONGODB_DB_USERNAME + ":" +
           process.env.OPENSHIFT_MONGODB_DB_PASSWORD + "@" +
           process.env.OPENSHIFT_MONGODB_DB_HOST + ':' +
           self.dbport + '/' +
           self.dbname;
-        };
+        } else {
+          console.log("We are in localhost");
+          self.connection_string = 'admin:VVkkGUKNh2by@' + self.ipaddress + ':' + self.dbport + '/' + self.dbname;
+        }
+        console.log("Connection string: ");
         console.log(self.connection_string);
 
     };
