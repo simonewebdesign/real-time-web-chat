@@ -157,7 +157,7 @@ var SampleApp = function() {
         MongoClient.connect('mongodb://'+connection_string, function(err, db) {
           if(err) throw err;
           var collection = db.collection('messages').find().limit(10).toArray(function(err, docs) {
-            console.dir(docs);
+            console.log(docs);
             db.close();
           })
         })
