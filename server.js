@@ -45,6 +45,7 @@ var SampleApp = function() {
           self.dbport + '/' +
           self.dbname;
         }
+        console.log(self.connection_string);
 
     };
 
@@ -157,6 +158,8 @@ var SampleApp = function() {
         MongoClient.connect('mongodb://' + self.connection_string, function(err, db) {
           if(err) throw err;
           var collection = db.collection('messages').find().limit(10).toArray(function(err, docs) {
+            console.log("MESSAGES (FIRST 10):");
+            if(err) throw err;
             console.log(docs);
             db.close();
           })
