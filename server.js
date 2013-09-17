@@ -22,15 +22,30 @@ var SampleApp = function() {
      */
     self.setupVariables = function() {
         //  Set the environment variables we need.
+        self.appname = process.env.OPENSHIFT_APP_NAME || 'rtwc';
         self.ipaddress = process.env.OPENSHIFT_INTERNAL_IP || process.env.OPENSHIFT_NODEJS_IP;
         self.port = process.env.OPENSHIFT_INTERNAL_PORT || process.env.OPENSHIFT_NODEJS_PORT || 8081;
+        self.dbport = process.env.OPENSHIFT_MONGODB_DB_PORT || 27017;
+        self.dbname = self.appname;
 
         if (typeof self.ipaddress === "undefined") {
             //  Log errors on OpenShift but continue w/ 127.0.0.1 - this
             //  allows us to run/test the app locally.
             console.warn('No OPENSHIFT_NODEJS_IP var, using 127.0.0.1');
             self.ipaddress = "127.0.0.1";
-        };
+        }
+
+        // default to a 'localhost' configuration:
+        self.connection_string = self.ipaddress + ':' + self.dbport + '/' + self.dbname;
+        // if OPENSHIFT env variables are present, use the available connection info:
+        if (process.env.OPENSHIFT_MONGODB_DB_PASSWORD) {
+          self.connection_string = process.env.OPENSHIFT_MONGODB_DB_USERNAME + ":" +
+          process.env.OPENSHIFT_MONGODB_DB_PASSWORD + "@" +
+          process.env.OPENSHIFT_MONGODB_DB_HOST + ':' +
+          self.dbport + '/' +
+          self.dbname;
+        }
+
     };
 
 
@@ -135,6 +150,18 @@ var SampleApp = function() {
 
     };
 
+    self.loadDataFromDatabase = function() {
+        //load the Client interface
+        var MongoClient = require('mongodb').MongoClient;
+        // the client db connection scope is wrapped in a callback:
+        MongoClient.connect('mongodb://'+connection_string, function(err, db) {
+          if(err) throw err;
+          var collection = db.collection('messages').find().limit(10).toArray(function(err, docs) {
+            console.dir(docs);
+            db.close();
+          })
+        })
+    }
 
     /**
      *  Initialize the server (express) and create the routes and register
@@ -167,7 +194,10 @@ var SampleApp = function() {
         self.setupTerminationHandlers();
 
         // Create the express server and routes.
-        self.initializeServer();     
+        self.initializeServer();
+
+        // Load messager
+        self.loadDataFromDatabase();
     };
 
 
