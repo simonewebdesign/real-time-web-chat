@@ -143,7 +143,7 @@ var SampleApp = function() {
 //            res.send(self.cache_get('index.html') );
 //        };
 
-        // another test route
+        // main route
         self.routes['/'] = function(req, res){
             res.render('page'); // page.jade is our template
         };
@@ -196,7 +196,7 @@ var SampleApp = function() {
         // Create the express server and routes.
         self.initializeServer();
 
-        // Load messager
+        // Load messages
         self.loadDataFromDatabase();
     };
 
