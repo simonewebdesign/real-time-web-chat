@@ -33,7 +33,7 @@ var SampleApp = function() {
             //  allows us to run/test the app locally.
             console.warn('No OPENSHIFT_NODEJS_IP var, using 127.0.0.1');
             self.ipaddress = "127.0.0.1";
-        }
+        };
 
         // default to a 'localhost' configuration:
         self.connection_string = self.ipaddress + ':' + self.dbport + '/' + self.dbname;
@@ -44,7 +44,7 @@ var SampleApp = function() {
           process.env.OPENSHIFT_MONGODB_DB_HOST + ':' +
           self.dbport + '/' +
           self.dbname;
-        }
+        };
         console.log(self.connection_string);
 
     };
@@ -80,7 +80,7 @@ var SampleApp = function() {
            console.log('%s: Received %s - terminating sample app ...',
                        Date(Date.now()), sig);
            process.exit(1);
-        }
+        };
         console.log('%s: Node server stopped.', Date(Date.now()) );
     };
 
@@ -162,9 +162,9 @@ var SampleApp = function() {
             if(err) throw err;
             console.log(docs);
             db.close();
-          })
-        })
-    }
+          });
+        });
+    };
 
     /**
      *  Initialize the server (express) and create the routes and register
@@ -196,11 +196,15 @@ var SampleApp = function() {
 //        self.populateCache();
         self.setupTerminationHandlers();
 
+        console.log("initializing server...")
         // Create the express server and routes.
         self.initializeServer();
+        console.log("done.");
 
+        console.log("Fetching messages from db...");
         // Load messages
         self.loadDataFromDatabase();
+        console.log("done.");
     };
 
 
