@@ -441,6 +441,14 @@ define(['emoticons', 'timer', 'socket.io'], function (emoticons, Timer) {
         printNotice(writingUsers);
     });
 
+    socket.on('messages loaded', function (data) {
+        //console.log("messages loaded!");
+        //console.log(data);
+        //console.log(typeof data === "array");
+        for (var i=0; i<data.length; i++) {
+            printMessage(data[i]);
+        }
+    });
 
     /***** client-side event listeners *****/
 

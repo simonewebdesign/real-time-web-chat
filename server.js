@@ -1,8 +1,9 @@
 #!/bin/env node
-//  OpenShift sample Node application
-var express = require('express');
-var fs      = require('fs');
-var io;
+//  Real Time Web Chat - The Server
+var express = require('express')
+  , fs = require('fs')
+  , io
+  , MongoClient = require('mongodb').MongoClient; //load the Client interface
 
 /**
  *  Define the sample application.
@@ -156,20 +157,18 @@ var SampleApp = function() {
 
     };
 
-    self.loadDataFromDatabase = function() {
-        //load the Client interface
-        var MongoClient = require('mongodb').MongoClient;
-        // the client db connection scope is wrapped in a callback:
-        MongoClient.connect('mongodb://' + self.connection_string, function(err, db) {
-          if(err) throw err;
-          var collection = db.collection('messages').find().limit(10).toArray(function(err, docs) {
-            console.log("MESSAGES (FIRST 10):");
-            if(err) throw err;
-            console.log(docs);
-            db.close();
-          });
-        });
-    };
+    //self.loadDataFromDatabase = function() {
+    //    // the client db connection scope is wrapped in a callback:
+    //    MongoClient.connect('mongodb://'+self.connection_string, function(err, db) {
+    //      if(err) throw err;
+    //      var collection = db.collection('messages').find().limit(10).toArray(function(err, docs) {
+    //        console.log("MESSAGES (FIRST 10):");
+    //        if(err) throw err;
+    //        console.log(docs);
+    //        db.close();
+    //      });
+    //    });
+    //};
 
     /**
      *  Initialize the server (express) and create the routes and register
@@ -198,7 +197,7 @@ var SampleApp = function() {
      */
     self.initialize = function() {
         self.setupVariables();
-//        self.populateCache();
+        //self.populateCache();
         self.setupTerminationHandlers();
 
         console.log("initializing server...")
@@ -206,10 +205,10 @@ var SampleApp = function() {
         self.initializeServer();
         console.log("done.");
 
-        console.log("Fetching messages from db...");
-        // Load messages
-        self.loadDataFromDatabase();
-        console.log("done.");
+        //console.log("Fetching messages from db...");
+        //// Load messages
+        //self.loadDataFromDatabase();
+        //console.log("done.");
     };
 
 
@@ -249,6 +248,20 @@ var SampleApp = function() {
 
             });
 
+            // 3) Load the most recent messages for the
+            //    user that has been connected.
+            MongoClient.connect('mongodb://'+self.connection_string, function(err, db) {
+                if(err) throw err;
+                console.log("Loading most recent messages...");              
+                db.collection('messages').find().limit(10).toArray(function(err, docs) {
+                    if(err) throw err;
+                    // send the recent messages to the client
+                    socket.emit('messages loaded', docs);
+                    db.close();
+                    console.log("done loading most recent messages.");
+                });
+            });
+
             socket.on('set nickname', function (user) {
                 socket.set('nickname', user.newName, function () {
                     socket.broadcast.emit('nickname set', user);
@@ -268,6 +281,16 @@ var SampleApp = function() {
                 io.sockets.emit('message', data);
                 // Note: io.sockets.emit() !== socket.emit()
                 // In theory it should be like sending both a broadcast and a socket.emit.
+
+                // save the data
+                MongoClient.connect('mongodb://'+self.connection_string, function(err, db) {
+                  if(err) throw err;
+                  collection.insert(data, {w:1}, function(err, result) {
+                    if(err) throw err;
+                    console.log("Message saved:" + data);
+                    db.close();
+                  });
+                });
             });
 
             socket.on('disconnect', function () {
