@@ -299,6 +299,26 @@ define(['emoticons', 'timer', 'socket.io'], function (emoticons, Timer) {
                 // scrollHeight is always higher than scrollTop.
                 content.scrollTop = content.scrollHeight;
             }
+        },
+
+        sendNotification = function (data) {
+            if (typeof Notification === "function") {
+                if (!Notification.permission || Notification.permission === "default") {
+                    Notification.requestPermission(function(perm){
+                        // for Chrome and Safari
+                        if (Notification.permission !== perm) {
+                            Notification.permission = perm;
+                        }
+                    });
+                }
+                if (Notification.permission === "granted") {
+                    var notification = new Notification(data.name, {
+                       body: data.text,
+                       tag: data.name
+                       // TODO icon: 'https://0.gravatar.com/avatar/70034fa76ec3ada7dc95ecb8dc01f74f&s=420'
+                    });
+                }
+            }            
         }
 
         // Removes an element from an array.
@@ -387,25 +407,7 @@ define(['emoticons', 'timer', 'socket.io'], function (emoticons, Timer) {
         // print it!
         printMessage(data);
         maybeScrollToBottom();
-
-        // notifications
-        //        try {
-        //
-        //            notification = new Notification(data.name, {
-        //               body: data.text,
-        //               dir: 'auto',
-        //               lang: 'en',
-        //               tag: 'test',
-        //               icon: 'https://0.gravatar.com/avatar/70034fa76ec3ada7dc95ecb8dc01f74f&s=420'
-        //            });
-        //
-        //            console.log('Permission is: ' + notification.permission);
-        //
-        //        } catch (exception) {
-        //           // Notifications not enabled or
-        //           // browser does not support them.
-        //           //console.log(exception);
-        //        }
+        sendNotification(data);
     });
 
     socket.on('written', function (data) {
@@ -470,13 +472,11 @@ define(['emoticons', 'timer', 'socket.io'], function (emoticons, Timer) {
     }, false);
 
 //    enableNotificationsButton.addEventListener('click', function (event) {
-//
+
 //        console.log("button clicked, should now enable notifications");
-//
-//        // FIXME not crossbrowser
-//        // FIXME not performant
-//        if (window.webkitNotifications) {
-//
+
+//        if (typeof Notification === "function") {
+
 //            Notification.requestPermission(function (perm) {
 //                console.log("perm: " + perm);
 //                if (perm === 'granted') {
@@ -485,7 +485,7 @@ define(['emoticons', 'timer', 'socket.io'], function (emoticons, Timer) {
 //                }
 //            });
 //        }
-//
+
 //    }, false);
 
 });
