@@ -227,7 +227,7 @@ define(['emoticons', 'timer', 'socket.io'], function (emoticons, Timer) {
 
             // time
             var timeHTMLElement = document.createElement('time');
-            timeHTMLElement.innerHTML = (new Date()).toLocaleTimeString();
+            timeHTMLElement.innerHTML = (new Date(data.time)).toLocaleTimeString();
 
 
             // append elements to the wrappers

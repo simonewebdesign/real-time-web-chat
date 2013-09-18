@@ -252,8 +252,8 @@ var SampleApp = function() {
             //    user that has been connected.
             MongoClient.connect('mongodb://'+self.connection_string, function(err, db) {
                 if(err) throw err;
-                console.log("Loading most recent messages...");              
-                db.collection('messages').find().limit(10).toArray(function(err, docs) {
+                console.log("Loading most recent messages...");
+                db.collection('messages').find().limit(20).toArray(function(err, docs) {
                     if(err) throw err;
                     // send the recent messages to the client
                     socket.emit('messages loaded', docs);
@@ -285,9 +285,10 @@ var SampleApp = function() {
                 // save the data
                 MongoClient.connect('mongodb://'+self.connection_string, function(err, db) {
                   if(err) throw err;
-                  collection.insert(data, {w:1}, function(err, result) {
+                  db.collection('messages').insert(data, {w:1}, function(err, result) {
                     if(err) throw err;
-                    console.log("Message saved:" + data);
+                    console.log("Message saved:");
+                    console.log(data);
                     db.close();
                   });
                 });
