@@ -3,7 +3,8 @@
 var express = require('express')
   , fs = require('fs')
   , io
-  , MongoClient = require('mongodb').MongoClient; //load the Client interface
+  , MongoClient = require('mongodb').MongoClient //load the Client interface
+  , MONGODB_ITEMS_TO_LOAD_LIMIT = 50
 
 /**
  *  Define the sample application.
@@ -253,7 +254,7 @@ var SampleApp = function() {
             MongoClient.connect('mongodb://'+self.connection_string, function(err, db) {
                 if(err) throw err;
                 console.log("Loading most recent messages...");
-                db.collection('messages').find().limit(20).toArray(function(err, docs) {
+                db.collection('messages').find().limit(MONGODB_ITEMS_TO_LOAD_LIMIT).toArray(function(err, docs) {
                     if(err) throw err;
                     // send the recent messages to the client
                     socket.emit('messages loaded', docs);
