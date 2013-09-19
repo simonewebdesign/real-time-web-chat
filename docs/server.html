@@ -1,0 +1,627 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+  <title>server.js</title>
+  <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+  <meta name="viewport" content="width=device-width, target-densitydpi=160dpi, initial-scale=1.0; maximum-scale=1.0; user-scalable=0;">
+  <link rel="stylesheet" media="all" href="docco.css" />
+</head>
+<body>
+  <div id="container">
+    <div id="background"></div>
+    
+    <ul class="sections">
+        
+          <li id="title">
+              <div class="annotation">
+                  <h1>server.js</h1>
+              </div>
+          </li>
+        
+        
+        
+        <li id="section-1">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-1">&#182;</a>
+              </div>
+              
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>#!<span class="regexp">/bin/</span>env node
+
+<span class="keyword">var</span> express = require(<span class="string">'express'</span>)
+  , fs = require(<span class="string">'fs'</span>)
+  , io
+  , MongoClient = require(<span class="string">'mongodb'</span>).MongoClient
+  , MONGODB_ITEMS_TO_LOAD_LIMIT = <span class="number">50</span>
+
+<span class="keyword">var</span> MyApp = <span class="keyword">function</span>() {
+
+    <span class="keyword">var</span> self = <span class="keyword">this</span>;</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-2">
+            <div class="annotation">
+              
+              <div class="pilwrap for-h2">
+                <a class="pilcrow" href="#section-2">&#182;</a>
+              </div>
+              <h2>Helper functions</h2>
+
+            </div>
+            
+        </li>
+        
+        
+        <li id="section-3">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-3">&#182;</a>
+              </div>
+              <p>Set up server IP address and port # using env variables/defaults.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    self.setupVariables = <span class="keyword">function</span>() {
+        self.appname = process.env.OPENSHIFT_APP_NAME || <span class="string">'rtwc'</span>;
+        self.ipaddress = process.env.OPENSHIFT_INTERNAL_IP || process.env.OPENSHIFT_NODEJS_IP;
+        self.port = process.env.OPENSHIFT_INTERNAL_PORT || process.env.OPENSHIFT_NODEJS_PORT || <span class="number">8082</span>;
+        self.dbport = process.env.OPENSHIFT_MONGODB_DB_PORT || <span class="number">27017</span>;
+        self.dbname = self.appname;
+
+        <span class="keyword">if</span> (<span class="keyword">typeof</span> self.ipaddress === <span class="string">"undefined"</span>) {</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-4">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-4">&#182;</a>
+              </div>
+              <p>Log errors on OpenShift but continue w/ 127.0.0.1 - this
+allows us to run/test the app locally.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>            console.warn(<span class="string">'No OPENSHIFT_NODEJS_IP var, using 127.0.0.1'</span>);
+            self.ipaddress = <span class="string">"127.0.0.1"</span>;
+        };</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-5">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-5">&#182;</a>
+              </div>
+              <p>if OPENSHIFT env variables are present, use the available connection info:</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>        <span class="keyword">if</span> (process.env.OPENSHIFT_MONGODB_DB_PASSWORD) {
+          console.log(<span class="string">"We are in OpenShift"</span>);
+          self.connection_string = process.env.OPENSHIFT_MONGODB_DB_USERNAME + <span class="string">":"</span> +
+          process.env.OPENSHIFT_MONGODB_DB_PASSWORD + <span class="string">"@"</span> +
+          process.env.OPENSHIFT_MONGODB_DB_HOST + <span class="string">':'</span> +
+          self.dbport + <span class="string">'/'</span> +
+          self.dbname;
+        } <span class="keyword">else</span> {</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-6">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-6">&#182;</a>
+              </div>
+              <p>default to a &#39;localhost&#39; configuration:  </p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>          console.log(<span class="string">"We are in localhost"</span>);
+          self.connection_string = <span class="string">'admin:VVkkGUKNh2by@'</span> + self.ipaddress + <span class="string">':'</span> + self.dbport + <span class="string">'/'</span> + self.dbname;
+        }
+    };
+
+
+    <span class="comment">/**
+     *  Populate the cache.
+     */</span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-7">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-7">&#182;</a>
+              </div>
+              <p>   self.populateCache = function() {
+       if (typeof self.zcache === &quot;undefined&quot;) {
+           self.zcache = { &#39;index.html&#39;: &#39;&#39; };
+       }</p>
+
+            </div>
+            
+        </li>
+        
+        
+        <li id="section-8">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-8">&#182;</a>
+              </div>
+              <p> Local cache for static content.
+       self.zcache[&#39;index.html&#39;] = fs.readFileSync(&#39;./index.html&#39;);
+   };</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>
+
+    <span class="comment">/**
+     *  Retrieve entry (content) from cache.
+     *  @param {string} key  Key identifying content to retrieve from cache.
+     */</span>
+    self.cache_get = <span class="keyword">function</span>(key) { <span class="keyword">return</span> self.zcache[key]; };
+
+
+    <span class="comment">/**
+     *  terminator === the termination handler
+     *  Terminate server on receipt of the specified signal.
+     *  @param {string} sig  Signal to terminate on.
+     */</span>
+    self.terminator = <span class="keyword">function</span>(sig){
+        <span class="keyword">if</span> (<span class="keyword">typeof</span> sig === <span class="string">"string"</span>) {
+           console.log(<span class="string">'%s: Received %s - terminating sample app ...'</span>,
+                       Date(Date.now()), sig);
+           process.exit(<span class="number">1</span>);
+        };
+        console.log(<span class="string">'%s: Node server stopped.'</span>, Date(Date.now()) );
+    };
+
+
+    <span class="comment">/**
+     *  Setup termination handlers (for exit and a list of signals).
+     */</span>
+    self.setupTerminationHandlers = <span class="keyword">function</span>(){</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-9">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-9">&#182;</a>
+              </div>
+              <p> Process on exit and signals.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>        process.on(<span class="string">'exit'</span>, <span class="keyword">function</span>() { self.terminator(); });
+
+        [<span class="string">'SIGHUP'</span>, <span class="string">'SIGINT'</span>, <span class="string">'SIGQUIT'</span>, <span class="string">'SIGILL'</span>, <span class="string">'SIGTRAP'</span>, <span class="string">'SIGABRT'</span>,
+         <span class="string">'SIGBUS'</span>, <span class="string">'SIGFPE'</span>, <span class="string">'SIGUSR1'</span>, <span class="string">'SIGSEGV'</span>, <span class="string">'SIGUSR2'</span>, <span class="string">'SIGTERM'</span>
+        ].forEach(<span class="keyword">function</span>(element, index, array) {
+            process.on(element, <span class="keyword">function</span>() { self.terminator(element); });
+        });
+    };</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-10">
+            <div class="annotation">
+              
+              <div class="pilwrap for-h2">
+                <a class="pilcrow" href="#section-10">&#182;</a>
+              </div>
+              <h2>App server functions</h2>
+<p>business logic goes here.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>
+    <span class="comment">/**
+     *  Create the routing table entries + handlers for the application.
+     */</span>
+    self.createRoutes = <span class="keyword">function</span>() {
+        self.routes = { };</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-11">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-11">&#182;</a>
+              </div>
+              <p>Routes for /health, /asciimo, /env and /</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>        self.routes[<span class="string">'/health'</span>] = <span class="keyword">function</span>(req, res) {
+            res.send(<span class="string">'1'</span>);
+        };
+
+        self.routes[<span class="string">'/asciimo'</span>] = <span class="keyword">function</span>(req, res) {
+            <span class="keyword">var</span> link = <span class="string">"http://i.imgur.com/kmbjB.png"</span>;
+            res.send(<span class="string">"&lt;html&gt;&lt;body&gt;&lt;img src='"</span> + link + <span class="string">"'&gt;&lt;/body&gt;&lt;/html&gt;"</span>);
+        };
+
+        self.routes[<span class="string">'/env'</span>] = <span class="keyword">function</span>(req, res) {
+            <span class="keyword">var</span> content = <span class="string">'Version: '</span> + process.version + <span class="string">'\n&lt;br/&gt;\n'</span> +
+                          <span class="string">'Env: {&lt;br/&gt;\n&lt;pre&gt;'</span>;</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-12">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-12">&#182;</a>
+              </div>
+              <p> Add env entries.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>            <span class="keyword">for</span> (<span class="keyword">var</span> k <span class="keyword">in</span> process.env) {
+               content += <span class="string">'   '</span> + k + <span class="string">': '</span> + process.env[k] + <span class="string">'\n'</span>;
+            }
+            content += <span class="string">'}\n&lt;/pre&gt;&lt;br/&gt;\n'</span>
+            res.send(content);
+            res.send(<span class="string">'&lt;html&gt;\n'</span> +
+                     <span class="string">'  &lt;head&gt;&lt;title&gt;Node.js Process Env&lt;/title&gt;&lt;/head&gt;\n'</span> +
+                     <span class="string">'  &lt;body&gt;\n&lt;br/&gt;\n'</span> + content + <span class="string">'&lt;/body&gt;\n&lt;/html&gt;'</span>);
+        };
+
+<span class="comment">/*
+        self.routes['/'] = function(req, res) {
+            res.set('Content-Type', 'text/html');
+            res.send(self.cache_get('index.html') );
+        };
+*/</span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-13">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-13">&#182;</a>
+              </div>
+              <p>main route</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>        self.routes[<span class="string">'/'</span>] = <span class="keyword">function</span>(req, res){
+            res.render(<span class="string">'page'</span>); <span class="comment">// page.jade is our template</span>
+        };
+
+    };
+
+
+    <span class="comment">/**
+     *  Initialize the server (express), create the routes and register
+     *  the handlers.
+     */</span>
+    self.initializeServer = <span class="keyword">function</span>() {
+        self.createRoutes();
+        self.app = express();</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-14">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-14">&#182;</a>
+              </div>
+              <p>Use Jade with ExpressJS</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>        self.app.set(<span class="string">'views'</span>, __dirname + <span class="string">'/tpl'</span>);
+        self.app.set(<span class="string">'view engine'</span>, <span class="string">'jade'</span>);
+        self.app.engine(<span class="string">'jade'</span>, require(<span class="string">'jade'</span>).__express);</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-15">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-15">&#182;</a>
+              </div>
+              <p> Add handlers for the app (from the routes).</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>        <span class="keyword">for</span> (<span class="keyword">var</span> r <span class="keyword">in</span> self.routes) {
+            self.app.get(r, self.routes[r]);
+        }
+
+        self.app.use(express.static(__dirname + <span class="string">'/public'</span>));               
+    };
+
+
+    <span class="comment">/**
+     *  Initializes the sample application.
+     */</span>
+    self.initialize = <span class="keyword">function</span>() {
+        self.setupVariables();
+        <span class="comment">/*self.populateCache();*/</span>
+        self.setupTerminationHandlers();
+        self.initializeServer();
+
+    };
+
+
+    <span class="comment">/**
+     *  Start the server (starts up the sample application).
+     */</span>
+    self.start = <span class="keyword">function</span>() {</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-16">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-16">&#182;</a>
+              </div>
+              <p>We pass the express server to socket.io</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>        io = require(<span class="string">'socket.io'</span>).listen(
+          self.app.listen(self.port, self.ipaddress, <span class="keyword">function</span>() {
+                    console.log(<span class="string">'%s: Node server started on %s:%d ...'</span>,
+                            Date(Date.now()), self.ipaddress, self.port);
+            }));</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-17">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-17">&#182;</a>
+              </div>
+              <p>socket is the junction between the server and the user&#39;s browser.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>        io.sockets.on(<span class="string">'connection'</span>, <span class="function"><span class="keyword">function</span> <span class="params">(socket)</span> {</span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-18">
+            <div class="annotation">
+              
+              <div class="pilwrap for-h6">
+                <a class="pilcrow" href="#section-18">&#182;</a>
+              </div>
+              <h6>Socket.io cheat sheet:</h6>
+<ul>
+<li>socket.emit()             emits to you only.</li>
+<li>socket.broadcast.emit()   emits to all, but not you.</li>
+<li>io.sockets.emit()         emits to all sockets.</li>
+</ul>
+
+            </div>
+            
+        </li>
+        
+        
+        <li id="section-19">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-19">&#182;</a>
+              </div>
+              <p>1) Every time a client connects, 
+   we send the Socket ID to him.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>            socket.emit(<span class="string">'connected'</span>, {id: socket.id});
+            console.log(<span class="string">"Socket with ID %s connected on %s"</span>, 
+                socket.id, <span class="keyword">new</span> Date());</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-20">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-20">&#182;</a>
+              </div>
+              <p>2) Let&#39;s see if the user is newish.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>            socket.on(<span class="string">'recognizing user'</span>, <span class="function"><span class="keyword">function</span> <span class="params">(user)</span> {</span>
+
+                <span class="keyword">if</span> (user.isNewish) {
+                    socket.set(<span class="string">'nickname'</span>, user.name);
+                }
+                
+                io.sockets.emit(<span class="string">'user recognized'</span>, user);
+
+            });</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-21">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-21">&#182;</a>
+              </div>
+              <p>3) Load the most recent messages for the
+   user that has been connected.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>            MongoClient.connect(<span class="string">'mongodb://'</span>+self.connection_string, <span class="keyword">function</span>(err, db) {
+                <span class="keyword">if</span>(err) <span class="keyword">throw</span> err;
+                console.log(<span class="string">"Loading most recent messages..."</span>);
+                db.collection(<span class="string">'messages'</span>).find().limit(MONGODB_ITEMS_TO_LOAD_LIMIT).toArray(<span class="keyword">function</span>(err, docs) {
+                    <span class="keyword">if</span>(err) <span class="keyword">throw</span> err;</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-22">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-22">&#182;</a>
+              </div>
+              <p>send the recent messages to the client</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>                    socket.emit(<span class="string">'messages loaded'</span>, docs);
+                    db.close();
+                    console.log(<span class="string">"done loading most recent messages."</span>);
+                });
+            });
+
+            socket.on(<span class="string">'set nickname'</span>, <span class="function"><span class="keyword">function</span> <span class="params">(user)</span> {</span>
+                socket.set(<span class="string">'nickname'</span>, user.newName, <span class="function"><span class="keyword">function</span> <span class="params">()</span> {</span>
+                    socket.broadcast.emit(<span class="string">'nickname set'</span>, user);
+                    socket.emit(<span class="string">'nickname set'</span>, user);
+                });
+            });
+
+            socket.on(<span class="string">'writing'</span>, <span class="function"><span class="keyword">function</span> <span class="params">(data)</span> {</span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-23">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-23">&#182;</a>
+              </div>
+              <p>To broadcast, simply add a <code>broadcast</code> flag to <code>emit</code>
+and <code>send</code> method calls. Broadcasting means sending a
+message to everyone else except for the socket that starts it.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>                <span class="keyword">this</span>.broadcast.emit(<span class="string">'written'</span>, data);
+            });
+
+            socket.on(<span class="string">'send message'</span>, <span class="function"><span class="keyword">function</span> <span class="params">(data)</span> {</span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-24">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-24">&#182;</a>
+              </div>
+              <p>forward the data sent by the user to all other sockets</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>                io.sockets.emit(<span class="string">'message'</span>, data);</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-25">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-25">&#182;</a>
+              </div>
+              <p>Note: io.sockets.emit() !== socket.emit()
+In theory it should be like sending both a broadcast and a socket.emit.</p>
+
+            </div>
+            
+        </li>
+        
+        
+        <li id="section-26">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-26">&#182;</a>
+              </div>
+              <p>save the data</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>                MongoClient.connect(<span class="string">'mongodb://'</span>+self.connection_string, <span class="keyword">function</span>(err, db) {
+                  <span class="keyword">if</span>(err) <span class="keyword">throw</span> err;
+                  db.collection(<span class="string">'messages'</span>).insert(data, {w:<span class="number">1</span>}, <span class="keyword">function</span>(err, result) {
+                    <span class="keyword">if</span>(err) <span class="keyword">throw</span> err;
+                    console.log(<span class="string">"Message saved:"</span>);
+                    console.log(data);
+                    db.close();
+                  });
+                });
+            });
+
+            socket.on(<span class="string">'disconnect'</span>, <span class="function"><span class="keyword">function</span> <span class="params">()</span> {</span>
+                socket.get(<span class="string">'nickname'</span>, <span class="keyword">function</span>(err, name) {
+                    socket.broadcast.emit(<span class="string">'disconnected'</span>, {
+                        id: socket.id,
+                        name: name 
+                    });
+                    console.log(<span class="string">"%s (%s) disconnected. %s"</span>, name, socket.id, <span class="keyword">new</span> Date());
+                });
+            });
+        });
+
+    };
+
+};   <span class="comment">/*  End of application.  */</span>
+
+
+<span class="comment">/**
+ *  main():  Main code.
+ */</span>
+<span class="keyword">var</span> server = <span class="keyword">new</span> MyApp();
+server.initialize();
+server.start();</pre></div></div>
+            
+        </li>
+        
+    </ul>
+  </div>
+</body>
+</html>

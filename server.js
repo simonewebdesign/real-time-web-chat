@@ -1,29 +1,19 @@
 #!/bin/env node
-//  Real Time Web Chat - The Server
+
 var express = require('express')
   , fs = require('fs')
   , io
-  , MongoClient = require('mongodb').MongoClient //load the Client interface
+  , MongoClient = require('mongodb').MongoClient
   , MONGODB_ITEMS_TO_LOAD_LIMIT = 50
 
-/**
- *  Define the sample application.
- */
-var SampleApp = function() {
+var MyApp = function() {
 
-    //  Scope.
     var self = this;
 
+    // ## Helper functions
 
-    /*  ================================================================  */
-    /*  Helper functions.                                                 */
-    /*  ================================================================  */
-
-    /**
-     *  Set up server IP address and port # using env variables/defaults.
-     */
+    // Set up server IP address and port # using env variables/defaults.
     self.setupVariables = function() {
-        //  Set the environment variables we need.
         self.appname = process.env.OPENSHIFT_APP_NAME || 'rtwc';
         self.ipaddress = process.env.OPENSHIFT_INTERNAL_IP || process.env.OPENSHIFT_NODEJS_IP;
         self.port = process.env.OPENSHIFT_INTERNAL_PORT || process.env.OPENSHIFT_NODEJS_PORT || 8082;
@@ -31,14 +21,12 @@ var SampleApp = function() {
         self.dbname = self.appname;
 
         if (typeof self.ipaddress === "undefined") {
-            //  Log errors on OpenShift but continue w/ 127.0.0.1 - this
-            //  allows us to run/test the app locally.
+            // Log errors on OpenShift but continue w/ 127.0.0.1 - this
+            // allows us to run/test the app locally.
             console.warn('No OPENSHIFT_NODEJS_IP var, using 127.0.0.1');
             self.ipaddress = "127.0.0.1";
         };
 
-        // default to a 'localhost' configuration:
-        //self.connection_string = self.ipaddress + ':' + self.dbport + '/' + self.dbname;
         // if OPENSHIFT env variables are present, use the available connection info:
         if (process.env.OPENSHIFT_MONGODB_DB_PASSWORD) {
           console.log("We are in OpenShift");
@@ -48,12 +36,10 @@ var SampleApp = function() {
           self.dbport + '/' +
           self.dbname;
         } else {
+          // default to a 'localhost' configuration:  
           console.log("We are in localhost");
           self.connection_string = 'admin:VVkkGUKNh2by@' + self.ipaddress + ':' + self.dbport + '/' + self.dbname;
         }
-        console.log("Connection string: ");
-        console.log(self.connection_string);
-
     };
 
 
@@ -99,7 +85,6 @@ var SampleApp = function() {
         //  Process on exit and signals.
         process.on('exit', function() { self.terminator(); });
 
-        // Removed 'SIGPIPE' from the list - bugz 852598.
         ['SIGHUP', 'SIGINT', 'SIGQUIT', 'SIGILL', 'SIGTRAP', 'SIGABRT',
          'SIGBUS', 'SIGFPE', 'SIGUSR1', 'SIGSEGV', 'SIGUSR2', 'SIGTERM'
         ].forEach(function(element, index, array) {
@@ -107,14 +92,9 @@ var SampleApp = function() {
         });
     };
 
-    self.setTemplateEngine = function() {
 
-    };
-
-
-    /*  ================================================================  */
-    /*  App server functions (main app logic here).                       */
-    /*  ================================================================  */
+    // ## App server functions
+    // business logic goes here.
 
     /**
      *  Create the routing table entries + handlers for the application.
@@ -146,11 +126,12 @@ var SampleApp = function() {
                      '  <body>\n<br/>\n' + content + '</body>\n</html>');
         };
 
-//        self.routes['/'] = function(req, res) {
-//            res.set('Content-Type', 'text/html');
-//            res.send(self.cache_get('index.html') );
-//        };
-
+/*
+        self.routes['/'] = function(req, res) {
+            res.set('Content-Type', 'text/html');
+            res.send(self.cache_get('index.html') );
+        };
+*/
         // main route
         self.routes['/'] = function(req, res){
             res.render('page'); // page.jade is our template
@@ -158,21 +139,9 @@ var SampleApp = function() {
 
     };
 
-    //self.loadDataFromDatabase = function() {
-    //    // the client db connection scope is wrapped in a callback:
-    //    MongoClient.connect('mongodb://'+self.connection_string, function(err, db) {
-    //      if(err) throw err;
-    //      var collection = db.collection('messages').find().limit(10).toArray(function(err, docs) {
-    //        console.log("MESSAGES (FIRST 10):");
-    //        if(err) throw err;
-    //        console.log(docs);
-    //        db.close();
-    //      });
-    //    });
-    //};
 
     /**
-     *  Initialize the server (express) and create the routes and register
+     *  Initialize the server (express), create the routes and register
      *  the handlers.
      */
     self.initializeServer = function() {
@@ -198,18 +167,10 @@ var SampleApp = function() {
      */
     self.initialize = function() {
         self.setupVariables();
-        //self.populateCache();
+        /*self.populateCache();*/
         self.setupTerminationHandlers();
-
-        console.log("initializing server...")
-        // Create the express server and routes.
         self.initializeServer();
-        console.log("done.");
 
-        //console.log("Fetching messages from db...");
-        //// Load messages
-        //self.loadDataFromDatabase();
-        //console.log("done.");
     };
 
 
@@ -225,12 +186,13 @@ var SampleApp = function() {
                             Date(Date.now()), self.ipaddress, self.port);
             }));
 
-        io.sockets.on('connection', function (socket) { // socket is the client's socket, the junction between the server and the user's browser.
+        // socket is the junction between the server and the user's browser.
+        io.sockets.on('connection', function (socket) {
 
-            //  Socket.io cheat sheet:
-            //    socket.emit()             emits to you only.
-            //    socket.broadcast.emit()   emits to all, but not you.
-            //    io.sockets.emit()         emits to all sockets.
+            // ###### Socket.io cheat sheet:
+            //  - socket.emit()             emits to you only.
+            //  - socket.broadcast.emit()   emits to all, but not you.
+            //  - io.sockets.emit()         emits to all sockets.
 
             // 1) Every time a client connects, 
             //    we send the Socket ID to him.
@@ -308,13 +270,12 @@ var SampleApp = function() {
 
     };
 
-};   /*  Sample Application.  */
-
+};   /*  End of application.  */
 
 
 /**
  *  main():  Main code.
  */
-var zapp = new SampleApp();
-zapp.initialize();
-zapp.start();
+var server = new MyApp();
+server.initialize();
+server.start();

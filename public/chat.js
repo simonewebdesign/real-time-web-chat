@@ -1,5 +1,4 @@
-
-/***** CLIENT *****/
+// # The Client
 
 define(['emoticons', 'timer', 'socket.io'], function (emoticons, Timer) {
 
@@ -8,6 +7,7 @@ define(['emoticons', 'timer', 'socket.io'], function (emoticons, Timer) {
         writingUsers = [],        
         timers = [],
 
+        // ### References to DOM elements
         field =      document.querySelector('.field'),
         sendButton = document.querySelector('.send'),
         content =    document.querySelector('.messages'),
@@ -16,14 +16,17 @@ define(['emoticons', 'timer', 'socket.io'], function (emoticons, Timer) {
 
         cmdRegex = /^\/([a-z0-9_-]+)\s?([a-z0-9_-]+)?\s?([a-z0-9_-]+)?$/i,
 
+        // ## Functions
+
+        // ### Getters and Setters
+
         // gets nickname from localStorage.
-        // return: string nickname, or null if nick hasn't been set yet.
+        // returns a string, or null if the nick hasn't been set yet.
         getNick = function() {
             return localStorage.getItem('name');
         },
 
-        // save nickname on localStorage.
-        // return: true on success, false otherwise.
+        // saves nickname in localStorage.
         setNick = function (nick) {
             if (nick) {
                 localStorage.setItem('name', nick);
@@ -32,10 +35,12 @@ define(['emoticons', 'timer', 'socket.io'], function (emoticons, Timer) {
             return false;
         },
 
+        // gets the Socket ID.
         getId = function() {
             return localStorage.getItem('id');
         },
 
+        // sets the Socket ID.
         setId = function(id) {
             if (id) {
                 localStorage.setItem('id', id);
@@ -44,9 +49,10 @@ define(['emoticons', 'timer', 'socket.io'], function (emoticons, Timer) {
             return false;
         },
 
-        // generates a random nickname.
+        // ### Utility functions
+
+        // generates a random nickname:
         // useful when an unknown user connects for the first time.
-        // return: string random nick
         generateNick = function() {
             var _maxRandomInt = 99999,
                 randomInt = Math.floor(Math.random()*_maxRandomInt+1),
@@ -55,7 +61,6 @@ define(['emoticons', 'timer', 'socket.io'], function (emoticons, Timer) {
         },
 
         // creates a new message.
-        // return: object the message
         message = function() {
 
             var id   = getId(),
@@ -73,8 +78,11 @@ define(['emoticons', 'timer', 'socket.io'], function (emoticons, Timer) {
             }
         },
 
+        // eats a message object, and returns the same object
+        // with the text's placeholders replaced with images.
+        // The images actually are just plain HTML.
         searchAndReplaceEmoticonsIn = function (message) {
-            // TODO msn
+
             for (var i=0; i<emoticons.skype.length; i++) {
 
                 var search = '',
@@ -95,16 +103,14 @@ define(['emoticons', 'timer', 'socket.io'], function (emoticons, Timer) {
             return message;
         },
 
-        // just tells us if the provided text is a command.
-        // return: true or false.
+        // is it a command?
         isCommand = function (text) {
             return cmdRegex.test(text);
         },
 
-        // get command name and arguments from the provided text.
-        // It assumes that the text is a command.
+        // gets command name and arguments from the provided text,
+        // assuming that the text is an actual command.
         // You should call isCommand() before this.
-        // return: an object with the command name and its arguments.
         getCommandFrom = function (text) {
             var matches = cmdRegex.exec(text),
                 name = matches[1],
@@ -119,50 +125,56 @@ define(['emoticons', 'timer', 'socket.io'], function (emoticons, Timer) {
             }
         },
 
-        // evaluates a command.
-        // string command the command name.
-        // array args the command arguments.
-        // return: true on success, false otherwise.
+        // evaluates a command. 
+        // the first parameter is the command name, while
+        // the second is an array containing the arguments.
         evaluate = function (command, args) {
 
-            // command name: nick
-            // description: set a new nickname
-            // usage: /nick <nickname>
-            if (/nick/i.test(command)) { // TODO we will use a switch statement here
+            // #### Commands
+
+            // ##### Nick
+            // sets the nickname.
+            // Usage: `/nick <nickname>`
+            if (/nick/i.test(command)) {
 
                 var name = args[0];
 
+                // here we just make sure the user has specified the new name.
+                // name is certainly valid because the command regex has
+                // already validated it.
                 if (name) {
 
-                    // name is certainly valid because the command regex has
-                    // already validated it.
-
-                    // notify the server and everything else that
-                    // I just changed the nick
+                    // notify the server
                     socket.emit('set nickname', {
-                        oldName: getNick(), // if we are setting a new nickname, we certainly have a nickname already.
+                        oldName: getNick(), 
                         newName: name
                     });
 
-                    // update my nickname
+                    // update nickname locally
                     setNick(name);
 
                     return true;
                 }
-            } else if (/foo/i.test(command)) {
-                alert(args[0]);
-                return true;
-            } else {
-                // not a valid command
-                printMessage({
-                    name: 'Server',
-                    text: command + ' is not a valid command.',
-                    type: 0,
-                    time: (new Date()).getTime()                    
-                });
-                maybeScrollToBottom();                
                 return false;
             }
+
+            // ##### Foo
+            // just a test command.
+            // Usage: `/foo [arg1] [arg2]`
+            if (/foo/i.test(command)) {
+                alert(args[0]);
+                return true;
+            }
+
+            // not a valid command...
+            printMessage({
+                name: 'Server',
+                text: command + ' is not a valid command.',
+                type: 0,
+                time: (new Date()).getTime()                    
+            });
+            maybeScrollToBottom();
+
             return false;
         },
 
@@ -192,43 +204,34 @@ define(['emoticons', 'timer', 'socket.io'], function (emoticons, Timer) {
         },
 
         // generates the HTML element representing a message, and prints it.
-        // object data the message to print.
-        // return: void
+        // data is the message object to print.
         printMessage = function (data) {
 
             if (!data.text) {
                 return;
             }
-            // create the HTML element
+
             var messageHTMLElement = document.createElement('div');
             messageHTMLElement.setAttribute('class', 'message clearfix');
 
             // create the wrappers
             var nicknameWrapperHTMLElement = document.createElement('div'),
-                textWrapperHTMLElement = document.createElement('div'),
-                timeWrapperHTMLElement = document.createElement('div');
+                textWrapperHTMLElement     = document.createElement('div'),
+                timeWrapperHTMLElement     = document.createElement('div');
 
-            // set classes to wrappers
             nicknameWrapperHTMLElement.setAttribute('class', 'name');
-            textWrapperHTMLElement.setAttribute('class', 'text');
-            timeWrapperHTMLElement.setAttribute('class', 'time');
+            textWrapperHTMLElement    .setAttribute('class', 'text');
+            timeWrapperHTMLElement    .setAttribute('class', 'time');
 
-            // name
-            var nicknameHTMLElement = document.createElement('b');
+            var nicknameHTMLElement = document.createElement('b'),
+                idHTMLElement       = document.createElement('span'),
+                textHTMLElement     = document.createElement('span'),
+                timeHTMLElement     = document.createElement('time');
+
             nicknameHTMLElement.innerHTML = data.name;
-
-            // id
-            var idHTMLElement = document.createElement('span');
             idHTMLElement.innerHTML = data.id;
-
-            // text
-            var textHTMLElement = document.createElement('span');
             textHTMLElement.innerHTML = data.text;
-
-            // time
-            var timeHTMLElement = document.createElement('time');
             timeHTMLElement.innerHTML = (new Date(data.time)).toLocaleTimeString();
-
 
             // append elements to the wrappers
             nicknameWrapperHTMLElement.appendChild(nicknameHTMLElement);
@@ -245,12 +248,9 @@ define(['emoticons', 'timer', 'socket.io'], function (emoticons, Timer) {
             content.appendChild(messageHTMLElement);
         },
 
-        // generates the HTML element representing a notice, and prints it.
-        // object data the message to print.
-        // ...
-        // updates the innerHTML.
-        // users: an array of the users that are currently writing something.
-        // return: void
+        // displays a notice like: *john is writing...*
+        // the argument is an array of the users that 
+        // are currently writing something.
         printNotice = function (users) {
 
             if (users.length < 1) {
@@ -271,32 +271,13 @@ define(['emoticons', 'timer', 'socket.io'], function (emoticons, Timer) {
         },
 
         // Scroll to the bottom if user is in the viewport.
-        // return: void
         maybeScrollToBottom = function () {
             var content = document.querySelector('.content');
-     
-            // scrollTop gets or sets the number of pixels
-            // that the content of an element is scrolled upward.
-            //console.log('scrollTop:    ' + content.scrollTop);
-     
-            // scrollHeight is the height of the scroll view of an element (in other words, the whole content's height); it includes the element padding but not its margin.
-            //console.log('scrollHeight: ' + content.scrollHeight);
-     
-            // offsetHeight is the height of an element relative to the element's offsetParent. In other words, it's the viewport, and it's constant.
-            //console.log('offsetHeight: ' + content.offsetHeight);
-            // Warning: clientHeight is the same, but you shouldn't use it, because it's not part of any W3C specification.
-     
-            // offsetParent returns a reference to the object which is the closest (nearest in the containment hierarchy) positioned containing element.
-            // I actually don't need this.
-            //console.log(content.offsetParent);
-     
-            // maxScrollTop is the maximum value scrollTop can assume.
+            // the maximum value scrollTop can assume.
             content.maxScrollTop = content.scrollHeight - content.offsetHeight;
-
             if (content.maxScrollTop - content.scrollTop <= content.offsetHeight) {
-                // setting scrollTop to a high number will bring us to the bottom.
-                // setting its value to scrollHeight seems a good idea, because
-                // scrollHeight is always higher than scrollTop.
+                // scrollHeight is always higher than scrollTop, so it
+                // will bring us to the bottom.
                 content.scrollTop = content.scrollHeight;
             }
         },
@@ -305,7 +286,8 @@ define(['emoticons', 'timer', 'socket.io'], function (emoticons, Timer) {
             if (typeof Notification === "function") {
                 if (!Notification.permission || Notification.permission === "default") {
                     Notification.requestPermission(function(perm){
-                        // for Chrome and Safari
+                        // for Chrome and Safari 
+                        // (because they haven't implemented Notification.permission yet)
                         if (Notification.permission !== perm) {
                             Notification.permission = perm;
                         }
@@ -315,25 +297,25 @@ define(['emoticons', 'timer', 'socket.io'], function (emoticons, Timer) {
                     var notification = new Notification(data.name, {
                        body: data.text,
                        tag: data.name
-                       // TODO icon: 'https://0.gravatar.com/avatar/70034fa76ec3ada7dc95ecb8dc01f74f&s=420'
                     });
                 }
-            }            
+            }
         }
 
-        // Removes an element from an array.
-        // string value the value to search and remove from the array.
-        // return: an array with the removed element; false otherwise.
+        // Removes an element from writingUsers.
+        // value is the string to remove from the array.
+        // Returns an array with the removed element; false otherwise.
         writingUsers.remove = function(value) {
             var idx = this.indexOf(value);
             if (idx != -1) {
-                return this.splice(idx, 1); // The second parameter of splice is the number of elements to remove.
+                // The second parameter of splice is the number of elements to remove.                
+                return this.splice(idx, 1);
             }
             return false;
         }
 
 
-    /***** server socket events *****/
+    // ### Web Socket events
 
     socket.on('connected', function (data) {
 
@@ -345,13 +327,13 @@ define(['emoticons', 'timer', 'socket.io'], function (emoticons, Timer) {
         // store Socket ID in client, for later use
         setId(data.id);
 
-        if (getNick()) { // returning user
+        // returning user?
+        if (getNick()) {
 
             user.name = getNick();
             user.isNewish = false;
 
-        } else { // new user
-
+        } else {
             // set nickname for the first time
             user.name = generateNick();
             user.isNewish = true;
@@ -378,8 +360,9 @@ define(['emoticons', 'timer', 'socket.io'], function (emoticons, Timer) {
 
     });
 
+    // this is a broadcast
     socket.on('nickname set', function (user) {
-        // This is a received broadcast
+
         printMessage({
             name: 'Server',
             text: user.oldName + ' changed his name to ' + user.newName,
@@ -389,6 +372,7 @@ define(['emoticons', 'timer', 'socket.io'], function (emoticons, Timer) {
         maybeScrollToBottom();        
     });
 
+    // this is a broadcast too
     socket.on('disconnected', function (data) {
 
         printMessage({
@@ -401,10 +385,6 @@ define(['emoticons', 'timer', 'socket.io'], function (emoticons, Timer) {
     });
 
     socket.on('message', function (data) {
-        // add the message to messages
-        // messages.push(data);
-
-        // print it!
         printMessage(data);
         maybeScrollToBottom();
         sendNotification(data);
@@ -429,63 +409,42 @@ define(['emoticons', 'timer', 'socket.io'], function (emoticons, Timer) {
             timers[data.name].start();
         }
 
+        // remove the user if it's in writingUsers
         if (data.text == '' || data.text.substring(0,1) == '/') {
-            // remove the user if it's in writingUsers
             writingUsers.remove(data.name);
-
         } else {
             // add the user to writingUsers array, if it isn't in already
             if (writingUsers.indexOf(data.name) == -1) {
                 writingUsers.push(data.name);
             }
         }
-        // print writingUsers
+
         printNotice(writingUsers);
     });
 
     socket.on('messages loaded', function (data) {
-        //console.log("messages loaded!");
-        //console.log(data);
-        //console.log(typeof data === "array");
         for (var i=0; i<data.length; i++) {
             printMessage(data[i]);
         }
     });
 
-    /***** client-side event listeners *****/
+    // ### Event listeners
 
     sendButton.addEventListener('click', function () {
-        // send it!
         send(message());
-        // alerts other users that this user is writing a message
+        // alerts the server that this user is writing a message
         socket.emit('writing', message());
     }, false);
 
     field.addEventListener('keyup', function (event) {
-        // pressed enter
+        // user pressed enter? then it's a message.
         if (event.keyCode == 13) {
             send(message());
         }
-        // alerts other users that this user is writing a message
+        // alerts the server that this user is writing a message
         socket.emit('writing', message());
 
     }, false);
 
-//    enableNotificationsButton.addEventListener('click', function (event) {
-
-//        console.log("button clicked, should now enable notifications");
-
-//        if (typeof Notification === "function") {
-
-//            Notification.requestPermission(function (perm) {
-//                console.log("perm: " + perm);
-//                if (perm === 'granted') {
-//                    // Tell your app it's OK to send notifications
-//                    webNotificationsEnabled = true;
-//                }
-//            });
-//        }
-
-//    }, false);
-
+// *"The last 29 days of the month are the hardest." - Nikola Tesla*
 });
