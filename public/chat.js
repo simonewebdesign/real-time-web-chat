@@ -297,7 +297,7 @@ define(['emoticons', 'timer', 'socket.io'], function (emoticons, Timer) {
                         }
                     });
                 }
-                if (Notification.permission === "granted") {
+                if (Notification.permission === "granted" && data.text) {
                     var notification = new Notification(data.name, {
                        body: data.text,
                        tag: data.name
@@ -439,6 +439,9 @@ define(['emoticons', 'timer', 'socket.io'], function (emoticons, Timer) {
         send(message());
         // alerts the server that this user is writing a message
         socket.emit('writing', message());
+
+        // enable Notifications (for WebKit users only)
+        sendNotification();
     }, false);
 
     field.addEventListener('keyup', function (event) {
