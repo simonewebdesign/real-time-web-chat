@@ -270,16 +270,20 @@ define(['emoticons', 'timer', 'socket.io'], function (emoticons, Timer) {
             notice.innerHTML = str;
         },
 
+        // Scroll to the bottom.
+        // scrollHeight is always higher than scrollTop, so it
+        // will certainly bring us to the bottom.   
+        scrollToBottom = function() {
+            var content = document.querySelector('.content');       
+            content.scrollTop = content.scrollHeight;
+        }
+
         // Scroll to the bottom if user is in the viewport.
-        maybeScrollToBottom = function () {
+        maybeScrollToBottom = function() {
             var content = document.querySelector('.content');
             // the maximum value scrollTop can assume.
             content.maxScrollTop = content.scrollHeight - content.offsetHeight;
-            if (content.maxScrollTop - content.scrollTop <= content.offsetHeight) {
-                // scrollHeight is always higher than scrollTop, so it
-                // will bring us to the bottom.
-                content.scrollTop = content.scrollHeight;
-            }
+            if (content.maxScrollTop - content.scrollTop <= content.offsetHeight) scrollToBottom();
         },
 
         sendNotification = function (data) {
@@ -426,6 +430,7 @@ define(['emoticons', 'timer', 'socket.io'], function (emoticons, Timer) {
         for (var i=0; i<data.length; i++) {
             printMessage(data[i]);
         }
+        scrollToBottom();
     });
 
     // ### Event listeners
