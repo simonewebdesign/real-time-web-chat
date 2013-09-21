@@ -12,7 +12,6 @@ define(['emoticons', 'timer', 'socket.io'], function (emoticons, Timer) {
         sendButton = document.querySelector('.send'),
         content =    document.querySelector('.messages'),
         notice =     document.querySelector('.notice'),
-        enableNotificationsButton = document.querySelector('.enable-notifications'),
 
         cmdRegex = /^\/([a-z0-9_-]+)\s?([a-z0-9_-]+)?\s?([a-z0-9_-]+)?$/i,
 
@@ -286,11 +285,15 @@ define(['emoticons', 'timer', 'socket.io'], function (emoticons, Timer) {
             if (content.maxScrollTop - content.scrollTop <= content.offsetHeight) scrollToBottom();
         },
 
+        // Checks if Notification is available in the browser. Then, asks to
+        // the user the permission to send notifications, if it doesn't have it
+        // already. Finally it sends a notification.
+        // If you don't provide the data parameter, it will just enable notifications.
         sendNotification = function (data) {
             if (typeof Notification === "function") {
                 if (!Notification.permission || Notification.permission === "default") {
                     Notification.requestPermission(function(perm){
-                        // for Chrome and Safari 
+                        // for Chrome and Safari
                         // (because they haven't implemented Notification.permission yet)
                         if (Notification.permission !== perm) {
                             Notification.permission = perm;

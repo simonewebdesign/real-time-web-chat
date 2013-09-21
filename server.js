@@ -41,20 +41,7 @@ var MyApp = function() {
           self.connection_string = 'admin:VVkkGUKNh2by@' + self.ipaddress + ':' + self.dbport + '/' + self.dbname;
         }
     };
-
-
-    /**
-     *  Populate the cache.
-     */
-//    self.populateCache = function() {
-//        if (typeof self.zcache === "undefined") {
-//            self.zcache = { 'index.html': '' };
-//        }
-
-        //  Local cache for static content.
-//        self.zcache['index.html'] = fs.readFileSync('./index.html');
-//    };
-
+    
 
     /**
      *  Retrieve entry (content) from cache.
@@ -126,12 +113,6 @@ var MyApp = function() {
                      '  <body>\n<br/>\n' + content + '</body>\n</html>');
         };
 
-/*
-        self.routes['/'] = function(req, res) {
-            res.set('Content-Type', 'text/html');
-            res.send(self.cache_get('index.html') );
-        };
-*/
         // main route
         self.routes['/'] = function(req, res){
             res.render('page'); // page.jade is our template
@@ -158,7 +139,8 @@ var MyApp = function() {
             self.app.get(r, self.routes[r]);
         }
 
-        self.app.use(express.static(__dirname + '/public'));               
+        self.app.use(express.static(__dirname + '/public'));
+        self.app.use('/docs', express.static(__dirname + '/docs'));            
     };
 
 
