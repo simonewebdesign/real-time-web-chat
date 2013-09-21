@@ -216,7 +216,7 @@ var MyApp = function() {
             MongoClient.connect('mongodb://'+self.connection_string, function(err, db) {
                 if(err) throw err;
                 console.log("Loading most recent messages...");
-                db.collection('messages').find().limit(MONGODB_ITEMS_TO_LOAD_LIMIT).toArray(function(err, docs) {
+                db.collection('messages').find().sort({_id:-1}).limit(MONGODB_ITEMS_TO_LOAD_LIMIT).toArray(function(err, docs) {
                     if(err) throw err;
                     // send the recent messages to the client
                     socket.emit('messages loaded', docs);
