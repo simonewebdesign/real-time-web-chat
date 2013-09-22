@@ -224,18 +224,18 @@ define(['emoticons', 'timer', 'socket.io'], function (emoticons, Timer) {
 
             var nicknameHTMLElement = document.createElement('b'),
                 idHTMLElement       = document.createElement('span'),
-                textHTMLElement     = document.createElement('span'),
+            //  textHTMLElement     = document.createElement('span'),
                 timeHTMLElement     = document.createElement('time');
 
             nicknameHTMLElement.innerHTML = data.name;
             idHTMLElement.innerHTML = data.id;
-            textHTMLElement.innerHTML = data.text;
+            textWrapperHTMLElement.innerHTML = data.text;
             timeHTMLElement.innerHTML = (new Date(data.time)).toLocaleTimeString();
 
             // append elements to the wrappers
             nicknameWrapperHTMLElement.appendChild(nicknameHTMLElement);
             nicknameWrapperHTMLElement.appendChild(idHTMLElement);
-            textWrapperHTMLElement.appendChild(textHTMLElement);
+            //textWrapperHTMLElement.appendChild(textHTMLElement);
             timeWrapperHTMLElement.appendChild(timeHTMLElement);
 
             // append wrappers to the .message
