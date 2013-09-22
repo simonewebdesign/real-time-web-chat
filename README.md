@@ -15,6 +15,10 @@ $ cd rtwc
 $ npm start
 ```
 
+## Documentation
+
+[See here](http://rtwc-simone.rhcloud.com/docs).
+
 Repo layout
 -----------
 
