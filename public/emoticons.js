@@ -1,5 +1,4 @@
-define([], function(){
-  return {   
+define({   
   skype: [
     {'(angel)' : 'angel.gif'},
     {':@' : 'angry.gif'},
@@ -163,7 +162,6 @@ define([], function(){
     {':bat:' : 'msn-vampirebat.gif'},
     {'wink::' : 'MSNwink.gif'} 
   ]  
-}
 });
 
 
