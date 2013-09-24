@@ -1,5 +1,3 @@
-console.log("timerSpec");
-
 require(["../public/timer"], function(Timer) {
 
 	describe("A timer", function() {
