@@ -6,14 +6,12 @@ Crafted with NodeJS, ExpressJS and Socket.io.
 
 [Download the application](https://github.com/simonewebdesign/real-time-web-chat/archive/master.zip), or clone the repository:
 
-`$ git clone https://github.com/simonewebdesign/real-time-web-chat.git rtwc`
+    $ git clone https://github.com/simonewebdesign/real-time-web-chat.git rtwc
 
 Go into the folder and start the server:
 
-```
-$ cd rtwc
-$ npm start
-```
+    $ cd rtwc
+    $ npm start
 
 ## Documentation
 
@@ -38,7 +36,8 @@ Notes about layout
 Please leave the `node_modules` and `.openshift` directories but feel free to
 create additional directories if needed.
 
-*Note*: Every time you push, everything in your remote repo dir gets recreated. Please store long term items (like an sqlite database) in the OpenShift data directory, which will persist between pushes of your repo.
+*Note*: Every time you push, everything in your remote repo dir gets recreated.
+Please store long term items (like an sqlite database) in the OpenShift data directory, which will persist between pushes of your repo.
 The OpenShift data directory is accessible relative to the remote repo directory (../data) or via an environment variable `OPENSHIFT_DATA_DIR`.
 
 
@@ -96,7 +95,8 @@ To get a full list of environment variables, simply add a line in your
 
 You can run the test suite with:
 
-``$ jasmine-node . --autotest --watch spec
+    $ npm install jasmine-node -g
+    $ jasmine-node . --autotest --watch spec
 
 --
 
