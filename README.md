@@ -92,6 +92,11 @@ To get a full list of environment variables, simply add a line in your
 - qs
 - traverse
 
+## Test Suite
+
+You can run the test suite with:
+
+``$ jasmine-node . --autotest --watch spec
 
 --
 
