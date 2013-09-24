@@ -93,10 +93,21 @@ To get a full list of environment variables, simply add a line in your
 
 ## Test Suite
 
-You can run the test suite with:
+First install [Jasmine](http://pivotal.github.io/jasmine/):
 
     $ npm install jasmine-node -g
+
+Then you can run the test suite with:
+
     $ jasmine-node . --autotest --watch spec
+
+Or with [RequireJS](http://requirejs.org/):
+
+    $ jasmine-node --runWithRequireJs --requireJsSetup spec/requirejs-setup.js spec
+
+If you want Jasmine to automatically rerun the whole test suite when a file changes, use:
+
+    $ jasmine-node . --verbose --runWithRequireJs --requireJsSetup spec/requirejs-setup.js --autotest --watch spec
 
 --
 
