@@ -195,7 +195,6 @@ define(['emoticons', 'timer', 'socket.io'], function (emoticons, Timer) {
                 // maybe add here a socket.emit('execute command')
                 // where the evaluate() returns true.
             } else {
-                searchAndReplaceEmoticonsIn(data);
                 socket.emit('send message', data);
             }
             // clear input tag
@@ -392,6 +391,7 @@ define(['emoticons', 'timer', 'socket.io'], function (emoticons, Timer) {
     });
 
     socket.on('message', function (data) {
+        searchAndReplaceEmoticonsIn(data);
         printMessage(data);
         maybeScrollToBottom();
         sendNotification(data);
