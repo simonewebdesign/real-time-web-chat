@@ -19,8 +19,10 @@ define(['emoticons', 'timer', 'socket.io'], function (emoticons, Timer) {
 
         // ### Getters and Setters
 
-        // gets nickname from localStorage.
-        // returns a string, or null if the nick hasn't been set yet.
+        // getters return `null` if the value hasn't been set first.
+
+        // setters return `true` on success, `false` otherwise.
+
         getNick = function() {
             return localStorage.getItem('name');
         },
