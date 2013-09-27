@@ -170,7 +170,7 @@ define(['emoticons', 'timer', 'types', 'socket.io'], function(emoticons, Timer, 
             printMessage({
                 name: 'Server',
                 text: command + ' is not a valid command.',
-                type: types.SYSTEM;
+                type: types.SYSTEM,
                 time: (new Date()).getTime()
             });
             maybeScrollToBottom();
