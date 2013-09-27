@@ -368,7 +368,7 @@ define(['emoticons', 'timer', 'types', 'socket.io'], function(emoticons, Timer, 
         var welcomeMessage = {
             name: 'Server',
             text: user.name + ' has joined the chat. ',
-            type: types.SYSTEM;
+            type: types.SYSTEM,
             time: (new Date()).getTime()
         };
 
@@ -384,7 +384,7 @@ define(['emoticons', 'timer', 'types', 'socket.io'], function(emoticons, Timer, 
         printMessage({
             name: 'Server',
             text: user.oldName + ' changed his name to ' + user.newName,
-            type: types.SYSTEM;
+            type: types.SYSTEM,
             time: (new Date()).getTime(),
         });
         maybeScrollToBottom();
@@ -396,7 +396,7 @@ define(['emoticons', 'timer', 'types', 'socket.io'], function(emoticons, Timer, 
         printMessage({
             name: 'Server',
             text: data.name + ' disconnected.',
-            type: types.SYSTEM;
+            type: types.SYSTEM,
             time: (new Date()).getTime()
         });
         maybeScrollToBottom();
