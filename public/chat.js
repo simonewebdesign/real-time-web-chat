@@ -1,6 +1,9 @@
 // # The Client
 
-define(['emoticons', 'timer', 'socket.io'], function(emoticons, Timer) {
+define(['emoticons', 'timer', 'types', 'socket.io'], function(emoticons, Timer, types) {
+
+    console.log(types);
+    console.log(types.NORMAL);
 
     var socket = io.connect('http://' + document.location.host),
 
@@ -62,13 +65,13 @@ define(['emoticons', 'timer', 'socket.io'], function(emoticons, Timer) {
         },
 
         // creates a new message.
-        message = function() {
+        message = function(options) {
 
-            var id   = getId(),
-                name = getNick(),
-                text = field.value.trim(),
-                type = 1,
-                time = (new Date()).getTime();
+            var id   = options.id   || getId(),
+                name = options.name || getNick(),
+                text = options.text || field.value.trim(),
+                type = options.type || types.NORMAL,
+                time = options.time || (new Date()).getTime();
 
             return {
                 id:   id,
