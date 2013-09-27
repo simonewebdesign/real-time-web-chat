@@ -2,9 +2,6 @@
 
 define(['emoticons', 'timer', 'types', 'socket.io'], function(emoticons, Timer, types) {
 
-    console.log(types);
-    console.log(types.NORMAL);
-
     var socket = io.connect('http://' + document.location.host),
 
         writingUsers = [],
@@ -67,7 +64,8 @@ define(['emoticons', 'timer', 'types', 'socket.io'], function(emoticons, Timer, 
         // creates a new message.
         message = function(options) {
 
-            var id   = options.id   || getId(),
+            var options = options 	|| {},
+            	id   = options.id   || getId(),
                 name = options.name || getNick(),
                 text = options.text || field.value.trim(),
                 type = options.type || types.NORMAL,
