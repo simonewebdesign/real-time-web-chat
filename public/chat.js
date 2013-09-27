@@ -7,7 +7,7 @@ define(['emoticons', 'timer', 'types', 'socket.io'], function(emoticons, Timer, 
 
     var socket = io.connect('http://' + document.location.host),
 
-        writingUsers = [],        
+        writingUsers = [],
         timers = [],
 
         // ### References to DOM elements
@@ -89,16 +89,14 @@ define(['emoticons', 'timer', 'types', 'socket.io'], function(emoticons, Timer, 
 
             for (var i=0; i<emoticons.skype.length; i++) {
 
-                var search = '',
-                    replacement = '';
-
+                var search, replacement;
                 for (var k in emoticons.skype[i]) {
                     search = k,
                     replacement = emoticons.skype[i][k];
                 }
 
-                var isContained = !!(message.text.indexOf(search) != -1);
-                if (isContained) {
+                // the `search` emoticon is contained in `message`
+                if (message.text.indexOf(search) != -1) {
                     var htmlReplacement = '<img src="img/skype/' + replacement +
                      '" alt="' + search + '" />';
                     message.text = message.text.replace(search, htmlReplacement);
@@ -175,7 +173,7 @@ define(['emoticons', 'timer', 'types', 'socket.io'], function(emoticons, Timer, 
                 name: 'Server',
                 text: command + ' is not a valid command.',
                 type: 0,
-                time: (new Date()).getTime()                    
+                time: (new Date()).getTime()
             });
             maybeScrollToBottom();
 
@@ -275,9 +273,9 @@ define(['emoticons', 'timer', 'types', 'socket.io'], function(emoticons, Timer, 
 
         // Scroll to the bottom.
         // scrollHeight is always higher than scrollTop, so it
-        // will certainly bring us to the bottom.   
+        // will certainly bring us to the bottom.
         scrollToBottom = function() {
-            var content = document.querySelector('.content');       
+            var content = document.querySelector('.content');
             content.scrollTop = content.scrollHeight;
         }
 
@@ -319,7 +317,6 @@ define(['emoticons', 'timer', 'types', 'socket.io'], function(emoticons, Timer, 
         writingUsers.remove = function(value) {
             var idx = this.indexOf(value);
             if (idx != -1) {
-                // The second parameter of splice is the number of elements to remove.                
                 return this.splice(idx, 1);
             }
             return false;
@@ -380,7 +377,7 @@ define(['emoticons', 'timer', 'types', 'socket.io'], function(emoticons, Timer, 
             type: 0,
             time: (new Date()).getTime(),
         });
-        maybeScrollToBottom();        
+        maybeScrollToBottom();
     });
 
     // this is a broadcast too
@@ -392,7 +389,7 @@ define(['emoticons', 'timer', 'types', 'socket.io'], function(emoticons, Timer, 
             type: 0,
             time: (new Date()).getTime()
         });
-        maybeScrollToBottom();        
+        maybeScrollToBottom();
     });
 
     socket.on('message', function(data) {
