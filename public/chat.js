@@ -1,6 +1,6 @@
 // # The Client
 
-define(['emoticons', 'timer', 'socket.io'], function (emoticons, Timer) {
+define(['emoticons', 'timer', 'socket.io'], function(emoticons, Timer) {
 
     var socket = io.connect('http://' + document.location.host),
 
@@ -28,7 +28,7 @@ define(['emoticons', 'timer', 'socket.io'], function (emoticons, Timer) {
         },
 
         // saves nickname in localStorage.
-        setNick = function (nick) {
+        setNick = function(nick) {
             if (nick) {
                 localStorage.setItem('name', nick);
                 return true;
@@ -82,7 +82,7 @@ define(['emoticons', 'timer', 'socket.io'], function (emoticons, Timer) {
         // eats a message object, and returns the same object
         // with the text's placeholders replaced with images.
         // The images actually are just plain HTML.
-        searchAndReplaceEmoticonsIn = function (message) {
+        searchAndReplaceEmoticonsIn = function(message) {
 
             for (var i=0; i<emoticons.skype.length; i++) {
 
@@ -105,14 +105,14 @@ define(['emoticons', 'timer', 'socket.io'], function (emoticons, Timer) {
         },
 
         // is it a command?
-        isCommand = function (text) {
+        isCommand = function(text) {
             return cmdRegex.test(text);
         },
 
         // gets command name and arguments from the provided text,
         // assuming that the text is an actual command.
         // You should call isCommand() before this.
-        getCommandFrom = function (text) {
+        getCommandFrom = function(text) {
             var matches = cmdRegex.exec(text),
                 name = matches[1],
                 args = [
@@ -129,7 +129,7 @@ define(['emoticons', 'timer', 'socket.io'], function (emoticons, Timer) {
         // evaluates a command. 
         // the first parameter is the command name, while
         // the second is an array containing the arguments.
-        evaluate = function (command, args) {
+        evaluate = function(command, args) {
 
             // #### Commands
 
@@ -184,7 +184,7 @@ define(['emoticons', 'timer', 'socket.io'], function (emoticons, Timer) {
         // else it just searches for emoticons and finally it notifies the server
         // that the user wants to send the message.
         // it also clears the field.value (input tag).
-        send = function (data) {
+        send = function(data) {
 
             if (data.text == '') {
                 return;
@@ -205,7 +205,7 @@ define(['emoticons', 'timer', 'socket.io'], function (emoticons, Timer) {
 
         // generates the HTML element representing a message, and prints it.
         // data is the message object to print.
-        printMessage = function (data) {
+        printMessage = function(data) {
 
             if (!data.text) {
                 return;
@@ -251,7 +251,7 @@ define(['emoticons', 'timer', 'socket.io'], function (emoticons, Timer) {
         // displays a notice like: *john is writing...*
         // the argument is an array of the users that 
         // are currently writing something.
-        printNotice = function (users) {
+        printNotice = function(users) {
 
             if (users.length < 1) {
                 notice.innerHTML = '';
@@ -290,7 +290,7 @@ define(['emoticons', 'timer', 'socket.io'], function (emoticons, Timer) {
         // the user the permission to send notifications, if it doesn't have it
         // already. Finally it sends a notification.
         // If you don't provide the data parameter, it will just enable notifications.
-        sendNotification = function (data) {
+        sendNotification = function(data) {
             if (typeof Notification === "function") {
                 if (!Notification.permission || Notification.permission === "default") {
                     Notification.requestPermission(function(perm){
@@ -325,7 +325,7 @@ define(['emoticons', 'timer', 'socket.io'], function (emoticons, Timer) {
 
     // ### Web Socket events
 
-    socket.on('connected', function (data) {
+    socket.on('connected', function(data) {
 
         // First of all, let's recognize the user.
         var user = {
@@ -353,7 +353,7 @@ define(['emoticons', 'timer', 'socket.io'], function (emoticons, Timer) {
         socket.emit('recognizing user', user);
     });
 
-    socket.on('user recognized', function (user) {
+    socket.on('user recognized', function(user) {
 
         var welcomeMessage = {
             name: 'Server',
@@ -369,7 +369,7 @@ define(['emoticons', 'timer', 'socket.io'], function (emoticons, Timer) {
     });
 
     // this is a broadcast
-    socket.on('nickname set', function (user) {
+    socket.on('nickname set', function(user) {
 
         printMessage({
             name: 'Server',
@@ -381,7 +381,7 @@ define(['emoticons', 'timer', 'socket.io'], function (emoticons, Timer) {
     });
 
     // this is a broadcast too
-    socket.on('disconnected', function (data) {
+    socket.on('disconnected', function(data) {
 
         printMessage({
             name: 'Server',
@@ -392,14 +392,14 @@ define(['emoticons', 'timer', 'socket.io'], function (emoticons, Timer) {
         maybeScrollToBottom();        
     });
 
-    socket.on('message', function (data) {
+    socket.on('message', function(data) {
         searchAndReplaceEmoticonsIn(data);
         printMessage(data);
         maybeScrollToBottom();
         sendNotification(data);
     });
 
-    socket.on('written', function (data) {
+    socket.on('written', function(data) {
         // if we don't have a timer for the user,
         // we instantiate one on the fly.
         // otherwise, we reset it.
@@ -431,7 +431,7 @@ define(['emoticons', 'timer', 'socket.io'], function (emoticons, Timer) {
         printNotice(writingUsers);
     });
 
-    socket.on('messages loaded', function (data) {
+    socket.on('messages loaded', function(data) {
         for (var i=0; i<data.length; i++) {
             printMessage(data[i]);
         }
@@ -440,7 +440,7 @@ define(['emoticons', 'timer', 'socket.io'], function (emoticons, Timer) {
 
     // ### Event listeners
 
-    sendButton.addEventListener('click', function () {
+    sendButton.addEventListener('click', function() {
         send(message());
         // alerts the server that this user is writing a message
         socket.emit('writing', message());
@@ -449,7 +449,7 @@ define(['emoticons', 'timer', 'socket.io'], function (emoticons, Timer) {
         sendNotification();
     }, false);
 
-    field.addEventListener('keyup', function (event) {
+    field.addEventListener('keyup', function(event) {
         // user pressed enter? then it's a message.
         if (event.keyCode == 13) {
             send(message());
