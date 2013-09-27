@@ -37,6 +37,7 @@
   , io
   , MongoClient = require(<span class="string">'mongodb'</span>).MongoClient
   , MONGODB_ITEMS_TO_LOAD_LIMIT = <span class="number">50</span>
+  , markdown = require(<span class="string">"markdown"</span>).markdown
 
 <span class="keyword">var</span> MyApp = <span class="keyword">function</span>() {
 
@@ -482,11 +483,11 @@ message to everyone else except for the socket that starts it.</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-20">&#182;</a>
               </div>
-              <p>forward the data sent by the user to all other sockets</p>
+              <p>convert the message from markdown to html</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>                io.sockets.emit(<span class="string">'message'</span>, data);</pre></div></div>
+            <div class="content"><div class='highlight'><pre>                data.text = markdown.toHTML(data.text);</pre></div></div>
             
         </li>
         
@@ -496,6 +497,21 @@ message to everyone else except for the socket that starts it.</p>
               
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-21">&#182;</a>
+              </div>
+              <p>forward the data sent by the user to all other sockets</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>                io.sockets.emit(<span class="string">'message'</span>, data);</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-22">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-22">&#182;</a>
               </div>
               <p>Note: io.sockets.emit() !== socket.emit()
 In theory it should be like sending both a broadcast and a socket.emit.</p>

@@ -25,11 +25,14 @@
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>define([<span class="string">'emoticons'</span>, <span class="string">'timer'</span>, <span class="string">'socket.io'</span>], <span class="function"><span class="keyword">function</span> <span class="params">(emoticons, Timer)</span> {</span>
+            <div class="content"><div class='highlight'><pre>define([<span class="string">'emoticons'</span>, <span class="string">'timer'</span>, <span class="string">'types'</span>, <span class="string">'socket.io'</span>], <span class="keyword">function</span>(emoticons, Timer, types) {
+
+    console.log(types);
+    console.log(types.NORMAL);
 
     <span class="keyword">var</span> socket = io.connect(<span class="string">'http://'</span> + document.location.host),
 
-        writingUsers = [],        
+        writingUsers = [],
         timers = [],</pre></div></div>
             
         </li>
@@ -63,8 +66,8 @@
               </div>
               <h2>Functions</h2>
 <h3>Getters and Setters</h3>
-<p>gets nickname from localStorage.
-returns a string, or null if the nick hasn&#39;t been set yet.</p>
+<p>getters return <code>null</code> if the value hasn&#39;t been set first.</p>
+<p>setters return <code>true</code> on success, <code>false</code> otherwise.</p>
 
             </div>
             
@@ -85,7 +88,7 @@ returns a string, or null if the nick hasn&#39;t been set yet.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>        setNick = <span class="function"><span class="keyword">function</span> <span class="params">(nick)</span> {</span>
+            <div class="content"><div class='highlight'><pre>        setNick = <span class="keyword">function</span>(nick) {
             <span class="keyword">if</span> (nick) {
                 localStorage.setItem(<span class="string">'name'</span>, nick);
                 <span class="keyword">return</span> <span class="literal">true</span>;
@@ -166,13 +169,13 @@ useful when an unknown user connects for the first time.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>        message = <span class="keyword">function</span>() {
+            <div class="content"><div class='highlight'><pre>        message = <span class="keyword">function</span>(options) {
 
-            <span class="keyword">var</span> id   = getId(),
-                name = getNick(),
-                text = field.value.trim(),
-                type = <span class="number">1</span>,
-                time = (<span class="keyword">new</span> Date()).getTime();
+            <span class="keyword">var</span> id   = options.id   || getId(),
+                name = options.name || getNick(),
+                text = options.text || field.value.trim(),
+                type = options.type || types.NORMAL,
+                time = options.time || (<span class="keyword">new</span> Date()).getTime();
 
             <span class="keyword">return</span> {
                 id:   id,
@@ -198,20 +201,30 @@ The images actually are just plain HTML.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>        searchAndReplaceEmoticonsIn = <span class="function"><span class="keyword">function</span> <span class="params">(message)</span> {</span>
+            <div class="content"><div class='highlight'><pre>        searchAndReplaceEmoticonsIn = <span class="keyword">function</span>(message) {
 
             <span class="keyword">for</span> (<span class="keyword">var</span> i=<span class="number">0</span>; i&lt;emoticons.skype.length; i++) {
 
-                <span class="keyword">var</span> search = <span class="string">''</span>,
-                    replacement = <span class="string">''</span>;
-
+                <span class="keyword">var</span> search, replacement;
                 <span class="keyword">for</span> (<span class="keyword">var</span> k <span class="keyword">in</span> emoticons.skype[i]) {
                     search = k,
                     replacement = emoticons.skype[i][k];
-                }
+                }</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-10">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-10">&#182;</a>
+              </div>
+              <p>the <code>search</code> emoticon is contained in <code>message</code></p>
 
-                <span class="keyword">var</span> isContained = !!(message.text.indexOf(search) != -<span class="number">1</span>);
-                <span class="keyword">if</span> (isContained) {
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>                <span class="keyword">if</span> (message.text.indexOf(search) != -<span class="number">1</span>) {
                     <span class="keyword">var</span> htmlReplacement = <span class="string">'&lt;img src="img/skype/'</span> + replacement +
                      <span class="string">'" alt="'</span> + search + <span class="string">'" /&gt;'</span>;
                     message.text = message.text.replace(search, htmlReplacement);
@@ -223,28 +236,28 @@ The images actually are just plain HTML.</p>
         </li>
         
         
-        <li id="section-10">
+        <li id="section-11">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-10">&#182;</a>
+                <a class="pilcrow" href="#section-11">&#182;</a>
               </div>
               <p>is it a command?</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>        isCommand = <span class="function"><span class="keyword">function</span> <span class="params">(text)</span> {</span>
+            <div class="content"><div class='highlight'><pre>        isCommand = <span class="keyword">function</span>(text) {
             <span class="keyword">return</span> cmdRegex.test(text);
         },</pre></div></div>
             
         </li>
         
         
-        <li id="section-11">
+        <li id="section-12">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-11">&#182;</a>
+                <a class="pilcrow" href="#section-12">&#182;</a>
               </div>
               <p>gets command name and arguments from the provided text,
 assuming that the text is an actual command.
@@ -252,7 +265,7 @@ You should call isCommand() before this.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>        getCommandFrom = <span class="function"><span class="keyword">function</span> <span class="params">(text)</span> {</span>
+            <div class="content"><div class='highlight'><pre>        getCommandFrom = <span class="keyword">function</span>(text) {
             <span class="keyword">var</span> matches = cmdRegex.exec(text),
                 name = matches[<span class="number">1</span>],
                 args = [
@@ -269,11 +282,11 @@ You should call isCommand() before this.</p>
         </li>
         
         
-        <li id="section-12">
+        <li id="section-13">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-12">&#182;</a>
+                <a class="pilcrow" href="#section-13">&#182;</a>
               </div>
               <p>evaluates a command. 
 the first parameter is the command name, while
@@ -281,16 +294,16 @@ the second is an array containing the arguments.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>        evaluate = <span class="function"><span class="keyword">function</span> <span class="params">(command, args)</span> {</span></pre></div></div>
+            <div class="content"><div class='highlight'><pre>        evaluate = <span class="keyword">function</span>(command, args) {</pre></div></div>
             
         </li>
         
         
-        <li id="section-13">
+        <li id="section-14">
             <div class="annotation">
               
               <div class="pilwrap for-h4">
-                <a class="pilcrow" href="#section-13">&#182;</a>
+                <a class="pilcrow" href="#section-14">&#182;</a>
               </div>
               <h4>Commands</h4>
 <h5>Nick</h5>
@@ -306,11 +319,11 @@ Usage: <code>/nick &lt;nickname&gt;</code></p>
         </li>
         
         
-        <li id="section-14">
+        <li id="section-15">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-14">&#182;</a>
+                <a class="pilcrow" href="#section-15">&#182;</a>
               </div>
               <p>here we just make sure the user has specified the new name.
 name is certainly valid because the command regex has
@@ -323,11 +336,11 @@ already validated it.</p>
         </li>
         
         
-        <li id="section-15">
+        <li id="section-16">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-15">&#182;</a>
+                <a class="pilcrow" href="#section-16">&#182;</a>
               </div>
               <p>notify the server</p>
 
@@ -341,11 +354,11 @@ already validated it.</p>
         </li>
         
         
-        <li id="section-16">
+        <li id="section-17">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-16">&#182;</a>
+                <a class="pilcrow" href="#section-17">&#182;</a>
               </div>
               <p>update nickname locally</p>
 
@@ -361,11 +374,11 @@ already validated it.</p>
         </li>
         
         
-        <li id="section-17">
+        <li id="section-18">
             <div class="annotation">
               
               <div class="pilwrap for-h5">
-                <a class="pilcrow" href="#section-17">&#182;</a>
+                <a class="pilcrow" href="#section-18">&#182;</a>
               </div>
               <h5>Foo</h5>
 <p>just a test command.
@@ -381,11 +394,11 @@ Usage: <code>/foo [arg1] [arg2]</code></p>
         </li>
         
         
-        <li id="section-18">
+        <li id="section-19">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-18">&#182;</a>
+                <a class="pilcrow" href="#section-19">&#182;</a>
               </div>
               <p>not a valid command...</p>
 
@@ -395,7 +408,7 @@ Usage: <code>/foo [arg1] [arg2]</code></p>
                 name: <span class="string">'Server'</span>,
                 text: command + <span class="string">' is not a valid command.'</span>,
                 type: <span class="number">0</span>,
-                time: (<span class="keyword">new</span> Date()).getTime()                    
+                time: (<span class="keyword">new</span> Date()).getTime()
             });
             maybeScrollToBottom();
 
@@ -405,11 +418,11 @@ Usage: <code>/foo [arg1] [arg2]</code></p>
         </li>
         
         
-        <li id="section-19">
+        <li id="section-20">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-19">&#182;</a>
+                <a class="pilcrow" href="#section-20">&#182;</a>
               </div>
               <p>reads the field.value. if it&#39;s empty, it just does nothing.
 checks whether the field.value is a command. If so, it executes it.
@@ -419,7 +432,7 @@ it also clears the field.value (input tag).</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>        send = <span class="function"><span class="keyword">function</span> <span class="params">(data)</span> {</span>
+            <div class="content"><div class='highlight'><pre>        send = <span class="keyword">function</span>(data) {
 
             <span class="keyword">if</span> (data.text == <span class="string">''</span>) {
                 <span class="keyword">return</span>;
@@ -433,11 +446,11 @@ it also clears the field.value (input tag).</p>
         </li>
         
         
-        <li id="section-20">
+        <li id="section-21">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-20">&#182;</a>
+                <a class="pilcrow" href="#section-21">&#182;</a>
               </div>
               <p>maybe add here a socket.emit(&#39;execute command&#39;)
 where the evaluate() returns true.</p>
@@ -445,18 +458,17 @@ where the evaluate() returns true.</p>
             </div>
             
             <div class="content"><div class='highlight'><pre>            } <span class="keyword">else</span> {
-                searchAndReplaceEmoticonsIn(data);
                 socket.emit(<span class="string">'send message'</span>, data);
             }</pre></div></div>
             
         </li>
         
         
-        <li id="section-21">
+        <li id="section-22">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-21">&#182;</a>
+                <a class="pilcrow" href="#section-22">&#182;</a>
               </div>
               <p>clear input tag</p>
 
@@ -468,18 +480,18 @@ where the evaluate() returns true.</p>
         </li>
         
         
-        <li id="section-22">
+        <li id="section-23">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-22">&#182;</a>
+                <a class="pilcrow" href="#section-23">&#182;</a>
               </div>
               <p>generates the HTML element representing a message, and prints it.
 data is the message object to print.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>        printMessage = <span class="function"><span class="keyword">function</span> <span class="params">(data)</span> {</span>
+            <div class="content"><div class='highlight'><pre>        printMessage = <span class="keyword">function</span>(data) {
 
             <span class="keyword">if</span> (!data.text) {
                 <span class="keyword">return</span>;
@@ -491,11 +503,11 @@ data is the message object to print.</p>
         </li>
         
         
-        <li id="section-23">
+        <li id="section-24">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-23">&#182;</a>
+                <a class="pilcrow" href="#section-24">&#182;</a>
               </div>
               <p>create the wrappers</p>
 
@@ -510,32 +522,7 @@ data is the message object to print.</p>
             timeWrapperHTMLElement    .setAttribute(<span class="string">'class'</span>, <span class="string">'time'</span>);
 
             <span class="keyword">var</span> nicknameHTMLElement = document.createElement(<span class="string">'b'</span>),
-                idHTMLElement       = document.createElement(<span class="string">'span'</span>),
-                textHTMLElement     = document.createElement(<span class="string">'span'</span>),
-                timeHTMLElement     = document.createElement(<span class="string">'time'</span>);
-
-            nicknameHTMLElement.innerHTML = data.name;
-            idHTMLElement.innerHTML = data.id;
-            textHTMLElement.innerHTML = data.text;
-            timeHTMLElement.innerHTML = (<span class="keyword">new</span> Date(data.time)).toLocaleTimeString();</pre></div></div>
-            
-        </li>
-        
-        
-        <li id="section-24">
-            <div class="annotation">
-              
-              <div class="pilwrap ">
-                <a class="pilcrow" href="#section-24">&#182;</a>
-              </div>
-              <p>append elements to the wrappers</p>
-
-            </div>
-            
-            <div class="content"><div class='highlight'><pre>            nicknameWrapperHTMLElement.appendChild(nicknameHTMLElement);
-            nicknameWrapperHTMLElement.appendChild(idHTMLElement);
-            textWrapperHTMLElement.appendChild(textHTMLElement);
-            timeWrapperHTMLElement.appendChild(timeHTMLElement);</pre></div></div>
+                idHTMLElement       = document.createElement(<span class="string">'span'</span>),</pre></div></div>
             
         </li>
         
@@ -545,6 +532,57 @@ data is the message object to print.</p>
               
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-25">&#182;</a>
+              </div>
+              <p> textHTMLElement     = document.createElement(&#39;span&#39;),</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>                timeHTMLElement     = document.createElement(<span class="string">'time'</span>);
+
+            nicknameHTMLElement.innerHTML = data.name;
+            idHTMLElement.innerHTML = data.id;
+            textWrapperHTMLElement.innerHTML = data.text;
+            timeHTMLElement.innerHTML = (<span class="keyword">new</span> Date(data.time)).toLocaleTimeString();</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-26">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-26">&#182;</a>
+              </div>
+              <p>append elements to the wrappers</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>            nicknameWrapperHTMLElement.appendChild(nicknameHTMLElement);
+            nicknameWrapperHTMLElement.appendChild(idHTMLElement);</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-27">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-27">&#182;</a>
+              </div>
+              <p>textWrapperHTMLElement.appendChild(textHTMLElement);</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>            timeWrapperHTMLElement.appendChild(timeHTMLElement);</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-28">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-28">&#182;</a>
               </div>
               <p>append wrappers to the .message</p>
 
@@ -557,11 +595,11 @@ data is the message object to print.</p>
         </li>
         
         
-        <li id="section-26">
+        <li id="section-29">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-26">&#182;</a>
+                <a class="pilcrow" href="#section-29">&#182;</a>
               </div>
               <p>append the .message to content</p>
 
@@ -573,11 +611,11 @@ data is the message object to print.</p>
         </li>
         
         
-        <li id="section-27">
+        <li id="section-30">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-27">&#182;</a>
+                <a class="pilcrow" href="#section-30">&#182;</a>
               </div>
               <p>displays a notice like: <em>john is writing...</em>
 the argument is an array of the users that 
@@ -585,7 +623,7 @@ are currently writing something.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>        printNotice = <span class="function"><span class="keyword">function</span> <span class="params">(users)</span> {</span>
+            <div class="content"><div class='highlight'><pre>        printNotice = <span class="keyword">function</span>(users) {
 
             <span class="keyword">if</span> (users.length &lt; <span class="number">1</span>) {
                 notice.innerHTML = <span class="string">''</span>;
@@ -607,31 +645,31 @@ are currently writing something.</p>
         </li>
         
         
-        <li id="section-28">
+        <li id="section-31">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-28">&#182;</a>
+                <a class="pilcrow" href="#section-31">&#182;</a>
               </div>
               <p>Scroll to the bottom.
 scrollHeight is always higher than scrollTop, so it
-will certainly bring us to the bottom.   </p>
+will certainly bring us to the bottom.</p>
 
             </div>
             
             <div class="content"><div class='highlight'><pre>        scrollToBottom = <span class="keyword">function</span>() {
-            <span class="keyword">var</span> content = document.querySelector(<span class="string">'.content'</span>);       
+            <span class="keyword">var</span> content = document.querySelector(<span class="string">'.content'</span>);
             content.scrollTop = content.scrollHeight;
         }</pre></div></div>
             
         </li>
         
         
-        <li id="section-29">
+        <li id="section-32">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-29">&#182;</a>
+                <a class="pilcrow" href="#section-32">&#182;</a>
               </div>
               <p>Scroll to the bottom if user is in the viewport.</p>
 
@@ -643,11 +681,11 @@ will certainly bring us to the bottom.   </p>
         </li>
         
         
-        <li id="section-30">
+        <li id="section-33">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-30">&#182;</a>
+                <a class="pilcrow" href="#section-33">&#182;</a>
               </div>
               <p>the maximum value scrollTop can assume.</p>
 
@@ -660,11 +698,11 @@ will certainly bring us to the bottom.   </p>
         </li>
         
         
-        <li id="section-31">
+        <li id="section-34">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-31">&#182;</a>
+                <a class="pilcrow" href="#section-34">&#182;</a>
               </div>
               <p>Checks if Notification is available in the browser. Then, asks to
 the user the permission to send notifications, if it doesn&#39;t have it
@@ -673,7 +711,7 @@ If you don&#39;t provide the data parameter, it will just enable notifications.<
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>        sendNotification = <span class="function"><span class="keyword">function</span> <span class="params">(data)</span> {</span>
+            <div class="content"><div class='highlight'><pre>        sendNotification = <span class="keyword">function</span>(data) {
             <span class="keyword">if</span> (<span class="keyword">typeof</span> Notification === <span class="string">"function"</span>) {
                 <span class="keyword">if</span> (!Notification.permission || Notification.permission === <span class="string">"default"</span>) {
                     Notification.requestPermission(<span class="keyword">function</span>(perm){</pre></div></div>
@@ -681,11 +719,11 @@ If you don&#39;t provide the data parameter, it will just enable notifications.<
         </li>
         
         
-        <li id="section-32">
+        <li id="section-35">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-32">&#182;</a>
+                <a class="pilcrow" href="#section-35">&#182;</a>
               </div>
               <p>for Chrome and Safari
 (because they haven&#39;t implemented Notification.permission yet)</p>
@@ -709,11 +747,11 @@ If you don&#39;t provide the data parameter, it will just enable notifications.<
         </li>
         
         
-        <li id="section-33">
+        <li id="section-36">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-33">&#182;</a>
+                <a class="pilcrow" href="#section-36">&#182;</a>
               </div>
               <p>Removes an element from writingUsers.
 value is the string to remove from the array.
@@ -723,22 +761,8 @@ Returns an array with the removed element; false otherwise.</p>
             
             <div class="content"><div class='highlight'><pre>        writingUsers.remove = <span class="keyword">function</span>(value) {
             <span class="keyword">var</span> idx = <span class="keyword">this</span>.indexOf(value);
-            <span class="keyword">if</span> (idx != -<span class="number">1</span>) {</pre></div></div>
-            
-        </li>
-        
-        
-        <li id="section-34">
-            <div class="annotation">
-              
-              <div class="pilwrap ">
-                <a class="pilcrow" href="#section-34">&#182;</a>
-              </div>
-              <p>The second parameter of splice is the number of elements to remove.                </p>
-
-            </div>
-            
-            <div class="content"><div class='highlight'><pre>                <span class="keyword">return</span> <span class="keyword">this</span>.splice(idx, <span class="number">1</span>);
+            <span class="keyword">if</span> (idx != -<span class="number">1</span>) {
+                <span class="keyword">return</span> <span class="keyword">this</span>.splice(idx, <span class="number">1</span>);
             }
             <span class="keyword">return</span> <span class="literal">false</span>;
         }</pre></div></div>
@@ -746,26 +770,26 @@ Returns an array with the removed element; false otherwise.</p>
         </li>
         
         
-        <li id="section-35">
+        <li id="section-37">
             <div class="annotation">
               
               <div class="pilwrap for-h3">
-                <a class="pilcrow" href="#section-35">&#182;</a>
+                <a class="pilcrow" href="#section-37">&#182;</a>
               </div>
               <h3>Web Socket events</h3>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>    socket.on(<span class="string">'connected'</span>, <span class="function"><span class="keyword">function</span> <span class="params">(data)</span> {</span></pre></div></div>
+            <div class="content"><div class='highlight'><pre>    socket.on(<span class="string">'connected'</span>, <span class="keyword">function</span>(data) {</pre></div></div>
             
         </li>
         
         
-        <li id="section-36">
+        <li id="section-38">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-36">&#182;</a>
+                <a class="pilcrow" href="#section-38">&#182;</a>
               </div>
               <p>First of all, let&#39;s recognize the user.</p>
 
@@ -778,11 +802,11 @@ Returns an array with the removed element; false otherwise.</p>
         </li>
         
         
-        <li id="section-37">
+        <li id="section-39">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-37">&#182;</a>
+                <a class="pilcrow" href="#section-39">&#182;</a>
               </div>
               <p>store Socket ID in client, for later use</p>
 
@@ -793,11 +817,11 @@ Returns an array with the removed element; false otherwise.</p>
         </li>
         
         
-        <li id="section-38">
+        <li id="section-40">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-38">&#182;</a>
+                <a class="pilcrow" href="#section-40">&#182;</a>
               </div>
               <p>returning user?</p>
 
@@ -813,11 +837,11 @@ Returns an array with the removed element; false otherwise.</p>
         </li>
         
         
-        <li id="section-39">
+        <li id="section-41">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-39">&#182;</a>
+                <a class="pilcrow" href="#section-41">&#182;</a>
               </div>
               <p>set nickname for the first time</p>
 
@@ -829,11 +853,11 @@ Returns an array with the removed element; false otherwise.</p>
         </li>
         
         
-        <li id="section-40">
+        <li id="section-42">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-40">&#182;</a>
+                <a class="pilcrow" href="#section-42">&#182;</a>
               </div>
               <p>and save it client-side</p>
 
@@ -845,7 +869,7 @@ Returns an array with the removed element; false otherwise.</p>
         socket.emit(<span class="string">'recognizing user'</span>, user);
     });
 
-    socket.on(<span class="string">'user recognized'</span>, <span class="function"><span class="keyword">function</span> <span class="params">(user)</span> {</span>
+    socket.on(<span class="string">'user recognized'</span>, <span class="keyword">function</span>(user) {
 
         <span class="keyword">var</span> welcomeMessage = {
             name: <span class="string">'Server'</span>,
@@ -863,17 +887,17 @@ Returns an array with the removed element; false otherwise.</p>
         </li>
         
         
-        <li id="section-41">
+        <li id="section-43">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-41">&#182;</a>
+                <a class="pilcrow" href="#section-43">&#182;</a>
               </div>
               <p>this is a broadcast</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>    socket.on(<span class="string">'nickname set'</span>, <span class="function"><span class="keyword">function</span> <span class="params">(user)</span> {</span>
+            <div class="content"><div class='highlight'><pre>    socket.on(<span class="string">'nickname set'</span>, <span class="keyword">function</span>(user) {
 
         printMessage({
             name: <span class="string">'Server'</span>,
@@ -881,23 +905,23 @@ Returns an array with the removed element; false otherwise.</p>
             type: <span class="number">0</span>,
             time: (<span class="keyword">new</span> Date()).getTime(),
         });
-        maybeScrollToBottom();        
+        maybeScrollToBottom();
     });</pre></div></div>
             
         </li>
         
         
-        <li id="section-42">
+        <li id="section-44">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-42">&#182;</a>
+                <a class="pilcrow" href="#section-44">&#182;</a>
               </div>
               <p>this is a broadcast too</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>    socket.on(<span class="string">'disconnected'</span>, <span class="function"><span class="keyword">function</span> <span class="params">(data)</span> {</span>
+            <div class="content"><div class='highlight'><pre>    socket.on(<span class="string">'disconnected'</span>, <span class="keyword">function</span>(data) {
 
         printMessage({
             name: <span class="string">'Server'</span>,
@@ -905,25 +929,26 @@ Returns an array with the removed element; false otherwise.</p>
             type: <span class="number">0</span>,
             time: (<span class="keyword">new</span> Date()).getTime()
         });
-        maybeScrollToBottom();        
+        maybeScrollToBottom();
     });
 
-    socket.on(<span class="string">'message'</span>, <span class="function"><span class="keyword">function</span> <span class="params">(data)</span> {</span>
+    socket.on(<span class="string">'message'</span>, <span class="keyword">function</span>(data) {
+        searchAndReplaceEmoticonsIn(data);
         printMessage(data);
         maybeScrollToBottom();
         sendNotification(data);
     });
 
-    socket.on(<span class="string">'written'</span>, <span class="function"><span class="keyword">function</span> <span class="params">(data)</span> {</span></pre></div></div>
+    socket.on(<span class="string">'written'</span>, <span class="keyword">function</span>(data) {</pre></div></div>
             
         </li>
         
         
-        <li id="section-43">
+        <li id="section-45">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-43">&#182;</a>
+                <a class="pilcrow" href="#section-45">&#182;</a>
               </div>
               <p>if we don&#39;t have a timer for the user,
 we instantiate one on the fly.
@@ -939,11 +964,11 @@ otherwise, we reset it.</p>
         </li>
         
         
-        <li id="section-44">
+        <li id="section-46">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-44">&#182;</a>
+                <a class="pilcrow" href="#section-46">&#182;</a>
               </div>
               <p>removes an user because the time has expired</p>
 
@@ -954,11 +979,11 @@ otherwise, we reset it.</p>
         </li>
         
         
-        <li id="section-45">
+        <li id="section-47">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-45">&#182;</a>
+                <a class="pilcrow" href="#section-47">&#182;</a>
               </div>
               <p>redisplays the notice</p>
 
@@ -969,11 +994,11 @@ otherwise, we reset it.</p>
         </li>
         
         
-        <li id="section-46">
+        <li id="section-48">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-46">&#182;</a>
+                <a class="pilcrow" href="#section-48">&#182;</a>
               </div>
               <p>maybe destroy the timer?</p>
 
@@ -988,11 +1013,11 @@ otherwise, we reset it.</p>
         </li>
         
         
-        <li id="section-47">
+        <li id="section-49">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-47">&#182;</a>
+                <a class="pilcrow" href="#section-49">&#182;</a>
               </div>
               <p>remove the user if it&#39;s in writingUsers</p>
 
@@ -1005,11 +1030,11 @@ otherwise, we reset it.</p>
         </li>
         
         
-        <li id="section-48">
+        <li id="section-50">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-48">&#182;</a>
+                <a class="pilcrow" href="#section-50">&#182;</a>
               </div>
               <p>add the user to writingUsers array, if it isn&#39;t in already</p>
 
@@ -1023,7 +1048,7 @@ otherwise, we reset it.</p>
         printNotice(writingUsers);
     });
 
-    socket.on(<span class="string">'messages loaded'</span>, <span class="function"><span class="keyword">function</span> <span class="params">(data)</span> {</span>
+    socket.on(<span class="string">'messages loaded'</span>, <span class="keyword">function</span>(data) {
         <span class="keyword">for</span> (<span class="keyword">var</span> i=<span class="number">0</span>; i&lt;data.length; i++) {
             printMessage(data[i]);
         }
@@ -1033,27 +1058,27 @@ otherwise, we reset it.</p>
         </li>
         
         
-        <li id="section-49">
+        <li id="section-51">
             <div class="annotation">
               
               <div class="pilwrap for-h3">
-                <a class="pilcrow" href="#section-49">&#182;</a>
+                <a class="pilcrow" href="#section-51">&#182;</a>
               </div>
               <h3>Event listeners</h3>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>    sendButton.addEventListener(<span class="string">'click'</span>, <span class="function"><span class="keyword">function</span> <span class="params">()</span> {</span>
+            <div class="content"><div class='highlight'><pre>    sendButton.addEventListener(<span class="string">'click'</span>, <span class="keyword">function</span>() {
         send(message());</pre></div></div>
             
         </li>
         
         
-        <li id="section-50">
+        <li id="section-52">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-50">&#182;</a>
+                <a class="pilcrow" href="#section-52">&#182;</a>
               </div>
               <p>alerts the server that this user is writing a message</p>
 
@@ -1064,11 +1089,11 @@ otherwise, we reset it.</p>
         </li>
         
         
-        <li id="section-51">
+        <li id="section-53">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-51">&#182;</a>
+                <a class="pilcrow" href="#section-53">&#182;</a>
               </div>
               <p>enable Notifications (for WebKit users only)</p>
 
@@ -1077,16 +1102,16 @@ otherwise, we reset it.</p>
             <div class="content"><div class='highlight'><pre>        sendNotification();
     }, <span class="literal">false</span>);
 
-    field.addEventListener(<span class="string">'keyup'</span>, <span class="function"><span class="keyword">function</span> <span class="params">(event)</span> {</span></pre></div></div>
+    field.addEventListener(<span class="string">'keyup'</span>, <span class="keyword">function</span>(event) {</pre></div></div>
             
         </li>
         
         
-        <li id="section-52">
+        <li id="section-54">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-52">&#182;</a>
+                <a class="pilcrow" href="#section-54">&#182;</a>
               </div>
               <p>user pressed enter? then it&#39;s a message.</p>
 
@@ -1099,11 +1124,11 @@ otherwise, we reset it.</p>
         </li>
         
         
-        <li id="section-53">
+        <li id="section-55">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-53">&#182;</a>
+                <a class="pilcrow" href="#section-55">&#182;</a>
               </div>
               <p>alerts the server that this user is writing a message</p>
 
@@ -1116,11 +1141,11 @@ otherwise, we reset it.</p>
         </li>
         
         
-        <li id="section-54">
+        <li id="section-56">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-54">&#182;</a>
+                <a class="pilcrow" href="#section-56">&#182;</a>
               </div>
               <p><em>&quot;The last 29 days of the month are the hardest.&quot; - Nikola Tesla</em></p>
 
