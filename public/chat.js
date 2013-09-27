@@ -160,6 +160,23 @@ define(['emoticons', 'timer', 'types', 'socket.io'], function(emoticons, Timer, 
                 return false;
             }
 
+            // ##### Msg
+            // Send a private message.
+            // Usage: `/msg [nick] [message]`
+            // Alias: `/m`
+            if (/m|sg/i.test(command)) {
+                var nick = args[0],
+                    text = args[1].trim();
+                if (text) {
+                    send(message({
+                        text: text,
+                        type: types.PRIVATE
+                    }));
+                    return true;
+                }
+                return false;
+            }
+
             // ##### Foo
             // just a test command.
             // Usage: `/foo [arg1] [arg2]`
