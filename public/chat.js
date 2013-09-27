@@ -172,7 +172,7 @@ define(['emoticons', 'timer', 'types', 'socket.io'], function(emoticons, Timer, 
             printMessage({
                 name: 'Server',
                 text: command + ' is not a valid command.',
-                type: 0,
+                type: types.SYSTEM;
                 time: (new Date()).getTime()
             });
             maybeScrollToBottom();
@@ -213,7 +213,19 @@ define(['emoticons', 'timer', 'types', 'socket.io'], function(emoticons, Timer, 
             }
 
             var messageHTMLElement = document.createElement('div');
-            messageHTMLElement.setAttribute('class', 'message clearfix');
+            var messageType;
+            switch(data.type) {
+                case types.SYSTEM:
+                    messageType = 'system';
+                    break;
+                case types.PRIVATE:
+                    messageType = 'private';
+                    break;
+                default:
+                    messageType = '';
+            }
+
+            messageHTMLElement.setAttribute('class', 'message clearfix ' + messageType);
 
             // create the wrappers
             var nicknameWrapperHTMLElement = document.createElement('div'),
@@ -358,7 +370,7 @@ define(['emoticons', 'timer', 'types', 'socket.io'], function(emoticons, Timer, 
         var welcomeMessage = {
             name: 'Server',
             text: user.name + ' has joined the chat. ',
-            type: 0,
+            type: types.SYSTEM;
             time: (new Date()).getTime()
         };
 
@@ -374,7 +386,7 @@ define(['emoticons', 'timer', 'types', 'socket.io'], function(emoticons, Timer, 
         printMessage({
             name: 'Server',
             text: user.oldName + ' changed his name to ' + user.newName,
-            type: 0,
+            type: types.SYSTEM;
             time: (new Date()).getTime(),
         });
         maybeScrollToBottom();
@@ -386,7 +398,7 @@ define(['emoticons', 'timer', 'types', 'socket.io'], function(emoticons, Timer, 
         printMessage({
             name: 'Server',
             text: data.name + ' disconnected.',
-            type: 0,
+            type: types.SYSTEM;
             time: (new Date()).getTime()
         });
         maybeScrollToBottom();
