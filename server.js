@@ -175,7 +175,8 @@ var MyApp = function() {
             // ###### Socket.io cheat sheet:
             //  - socket.emit()             emits to you only.
             //  - socket.broadcast.emit()   emits to all, but not you.
-            //  - io.sockets.emit()         emits to all sockets.
+            //  - io.sockets.emit()         emits to all sockets. NO, not exactly.
+            // It means: all sockets will emit this!
 
             // 1) Every time a client connects, 
             //    we send the Socket ID to him.
@@ -185,30 +186,24 @@ var MyApp = function() {
 
             // 2) Let's see if the user is newish.
             socket.on('recognizing user', function (user) {
-
-                //if (user.isNewish) {
-                //    socket.set('nickname', user.name);
-                //}
-                
-                io.sockets.emit('user recognized', user);
-
+                socket.set('nickname', user.name);                
+                socket.emit('user recognized', user);
             });
 
             // 3) Load the most recent messages for the
             //    user that has been connected.
-            MongoClient.connect('mongodb://'+self.connection_string, function(err, db) {
-                if(err) throw err;
-                db.collection('messages').find().sort({$natural: -1}).limit(MONGODB_ITEMS_TO_LOAD_LIMIT).toArray(function(err, docs) {
-                    if(err) throw err;
-                    // send the recent messages to the client
-                    socket.emit('messages loaded', docs.reverse());
-                    db.close();
-                });
-            });
+            // MongoClient.connect('mongodb://'+self.connection_string, function(err, db) {
+            //     if(err) throw err;
+            //     db.collection('messages').find().sort({$natural: -1}).limit(MONGODB_ITEMS_TO_LOAD_LIMIT).toArray(function(err, docs) {
+            //         if(err) throw err;
+            //         // send the recent messages to the client
+            //         socket.emit('messages loaded', docs.reverse());
+            //         db.close();
+            //     });
+            // });
 
             socket.on('set nickname', function (user) {
                 socket.set('nickname', user.newName, function () {
-                    socket.broadcast.emit('nickname set', user);
                     socket.emit('nickname set', user);
                 });
             });
@@ -241,15 +236,14 @@ var MyApp = function() {
             });
 
             socket.on('disconnect', function () {
-              //  socket.get('nickname', function(err, name) {
-              //      if(err) throw err;
-              //      socket.broadcast.emit('disconnected', {
-              //          id: socket.id,
-              //          name: name 
-              //      });
-              //      console.log("%s (%s) disconnected. %s", name, socket.id, new Date());
-              //  });
-              console.log("%s (%s) disconnected. %s", name, socket.id, new Date());
+                socket.get('nickname', function(err, name) {
+                    if(err) throw err;
+                    socket.broadcast.emit('disconnected', {
+                        id: socket.id,
+                        name: name 
+                    });
+                    console.log("%s (%s) disconnected. %s", name, socket.id, new Date());
+                });
             });
         });
 

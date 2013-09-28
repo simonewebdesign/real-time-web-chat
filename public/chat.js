@@ -380,43 +380,37 @@ define(['emoticons', 'timer', 'types', 'socket.io'], function(emoticons, Timer, 
         socket.emit('recognizing user', user);
     });
 
+    // to all
     socket.on('user recognized', function(user) {
 
-        var welcomeMessage = {
+        var welcomeText = user.name + ' has joined the chat. ';
+        welcomeText += user.isNewish ? 'Welcome!' : 'Welcome back!';
+
+        send(message({
             name: 'Server',
-            text: user.name + ' has joined the chat. ',
             type: types.SYSTEM,
-            time: (new Date()).getTime()
-        };
-
-        welcomeMessage.text += user.isNewish ? 'Welcome!' : 'Welcome back!';
-        printMessage(welcomeMessage);
-        maybeScrollToBottom();
-
+            text: welcomeText
+        }));
     });
 
-    // this is a broadcast
+    // to all
     socket.on('nickname set', function(user) {
 
-        printMessage({
+        send(message({
             name: 'Server',
-            text: user.oldName + ' changed his name to ' + user.newName,
             type: types.SYSTEM,
-            time: (new Date()).getTime(),
-        });
-        maybeScrollToBottom();
+            text: user.oldName + ' changed his name to ' + user.newName
+        }));
     });
 
-    // this is a broadcast too
+    // to all
     socket.on('disconnected', function(data) {
 
-        printMessage({
+        send(message({
             name: 'Server',
-            text: data.name + ' disconnected.',
-            type: types.SYSTEM,
-            time: (new Date()).getTime()
-        });
-        maybeScrollToBottom();
+            type: types.SYSTEM,            
+            text: data.name + ' has quit.'
+        }));
     });
 
     socket.on('message', function(data) {
