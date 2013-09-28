@@ -186,9 +186,9 @@ var MyApp = function() {
             // 2) Let's see if the user is newish.
             socket.on('recognizing user', function (user) {
 
-                if (user.isNewish) {
-                    socket.set('nickname', user.name);
-                }
+                //if (user.isNewish) {
+                //    socket.set('nickname', user.name);
+                //}
                 
                 io.sockets.emit('user recognized', user);
 
@@ -241,14 +241,15 @@ var MyApp = function() {
             });
 
             socket.on('disconnect', function () {
-                socket.get('nickname', function(err, name) {
-                    if(err) throw err;
-                    socket.broadcast.emit('disconnected', {
-                        id: socket.id,
-                        name: name 
-                    });
-                    console.log("%s (%s) disconnected. %s", name, socket.id, new Date());
-                });
+              //  socket.get('nickname', function(err, name) {
+              //      if(err) throw err;
+              //      socket.broadcast.emit('disconnected', {
+              //          id: socket.id,
+              //          name: name 
+              //      });
+              //      console.log("%s (%s) disconnected. %s", name, socket.id, new Date());
+              //  });
+              console.log("%s (%s) disconnected. %s", name, socket.id, new Date());
             });
         });
 

@@ -62,6 +62,12 @@ input.field
 .message:nth-child(2n+1) {
   background-color: #eee;
 }
+.message.system {
+  background: yellow;
+}
+.message.private {
+  background: purple;
+}
 
 .message .text,
 .message .time {
