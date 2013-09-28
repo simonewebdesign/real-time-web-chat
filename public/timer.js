@@ -1,4 +1,4 @@
-define([], function() {
+define(function() {
   
   // A timer. Useful to display notices in our web chat app.
   // function callback
