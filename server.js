@@ -238,7 +238,7 @@ var MyApp = function() {
             socket.on('disconnect', function () {
                 socket.get('nickname', function(err, name) {
                     if(err) throw err;
-                    socket.broadcast.emit('disconnected', {
+                    socket.emit('disconnected', {
                         id: socket.id,
                         name: name 
                     });
