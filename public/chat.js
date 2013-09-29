@@ -401,6 +401,7 @@ define(['emoticons', 'timer', 'types', 'socket.io'], function(emoticons, Timer, 
             type: types.SYSTEM,
             text: welcomeText
         }));
+        playSound('connection_smb_flagpole.wav');
     });
 
     // to all
@@ -411,6 +412,7 @@ define(['emoticons', 'timer', 'types', 'socket.io'], function(emoticons, Timer, 
             type: types.SYSTEM,
             text: user.oldName + ' changed his name to ' + user.newName
         }));
+        playSound('wav/nickname_set_smb_jump-small.wav');
     });
 
     // to all
@@ -418,9 +420,10 @@ define(['emoticons', 'timer', 'types', 'socket.io'], function(emoticons, Timer, 
 
         send(message({
             name: 'Server',
-            type: types.SYSTEM,            
+            type: types.SYSTEM,
             text: data.name + ' has quit.'
-        }));
+        }));        
+        playSound('wav/disconnection_smb_bowserfalls.wav');
     });
 
     socket.on('message', function(data) {
@@ -428,6 +431,7 @@ define(['emoticons', 'timer', 'types', 'socket.io'], function(emoticons, Timer, 
         printMessage(data);
         maybeScrollToBottom();
         sendNotification(data);
+        playSound('wav/message_smb_kick.wav');
     });
 
     socket.on('written', function(data) {
