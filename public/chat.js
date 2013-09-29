@@ -328,7 +328,7 @@ define(['emoticons', 'timer', 'types', 'socket.io'], function(emoticons, Timer, 
                         }
                     });
                 }
-                if (Notification.permission === 'granted' && data.text) {
+                if (Notification.permission === 'granted' && data.text && !window.isActive) {
                     var notification = new Notification(data.name, {
                        body: data.text,
                        tag: data.name
@@ -497,6 +497,10 @@ define(['emoticons', 'timer', 'types', 'socket.io'], function(emoticons, Timer, 
         socket.emit('writing', message());
 
     }, false);
+
+    // for the notifications
+    window.onfocus = function() { window.isActive = true; };
+    window.onblur =  function() { window.isActive = false; };
 
 // *"The last 29 days of the month are the hardest." - Nikola Tesla*
 });
