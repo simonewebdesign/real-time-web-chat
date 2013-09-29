@@ -5,7 +5,7 @@ var express = require('express')
   , io
   , MongoClient = require('mongodb').MongoClient
   , MONGODB_ITEMS_TO_LOAD_LIMIT = 50
-  , markdown = require("markdown").markdown
+  , markdown = require('markdown').markdown
 
 var MyApp = function() {
 
@@ -21,24 +21,24 @@ var MyApp = function() {
         self.dbport = process.env.OPENSHIFT_MONGODB_DB_PORT || 27017;
         self.dbname = self.appname;
 
-        if (typeof self.ipaddress === "undefined") {
+        if (typeof self.ipaddress === 'undefined') {
             // Log errors on OpenShift but continue w/ 127.0.0.1 - this
             // allows us to run/test the app locally.
             console.warn('No OPENSHIFT_NODEJS_IP var, using 127.0.0.1');
-            self.ipaddress = "127.0.0.1";
+            self.ipaddress = '127.0.0.1';
         };
 
         // if OPENSHIFT env variables are present, use the available connection info:
         if (process.env.OPENSHIFT_MONGODB_DB_PASSWORD) {
-          console.log("We are in OpenShift");
-          self.connection_string = process.env.OPENSHIFT_MONGODB_DB_USERNAME + ":" +
-          process.env.OPENSHIFT_MONGODB_DB_PASSWORD + "@" +
+          console.log('We are in OpenShift');
+          self.connection_string = process.env.OPENSHIFT_MONGODB_DB_USERNAME + ':' +
+          process.env.OPENSHIFT_MONGODB_DB_PASSWORD + '@' +
           process.env.OPENSHIFT_MONGODB_DB_HOST + ':' +
           self.dbport + '/' +
           self.dbname;
         } else {
           // default to a 'localhost' configuration:  
-          console.log("We are in localhost");
+          console.log('We are in localhost');
           self.connection_string = 'admin:VVkkGUKNh2by@' + self.ipaddress + ':' + self.dbport + '/' + self.dbname;
         }
     };
@@ -57,7 +57,7 @@ var MyApp = function() {
      *  @param {string} sig  Signal to terminate on.
      */
     self.terminator = function(sig){
-        if (typeof sig === "string") {
+        if (typeof sig === 'string') {
            console.log('%s: Received %s - terminating sample app ...',
                        Date(Date.now()), sig);
            process.exit(1);
@@ -96,7 +96,7 @@ var MyApp = function() {
         };
 
         self.routes['/asciimo'] = function(req, res) {
-            var link = "http://i.imgur.com/kmbjB.png";
+            var link = 'http://i.imgur.com/kmbjB.png';
             res.send("<html><body><img src='" + link + "'></body></html>");
         };
 
@@ -181,7 +181,7 @@ var MyApp = function() {
             // 1) Every time a client connects, 
             //    we send the Socket ID to him.
             socket.emit('connected', {id: socket.id});
-            console.log("Socket with ID %s connected on %s", 
+            console.log('Socket with ID %s connected on %s', 
                 socket.id, new Date());
 
             // 2) Let's see if the user is newish.
@@ -228,7 +228,7 @@ var MyApp = function() {
                   if(err) throw err;
                   db.collection('messages').insert(data, {w:1}, function(err, result) {
                     if(err) throw err;
-                    console.log("Message saved:");
+                    console.log('Message saved:');
                     console.log(data);
                     db.close();
                   });
@@ -242,7 +242,7 @@ var MyApp = function() {
                         id: socket.id,
                         name: name 
                     });
-                    console.log("%s (%s) disconnected. %s", name, socket.id, new Date());
+                    console.log('%s (%s) disconnected. %s', name, socket.id, new Date());
                 });
             });
         });

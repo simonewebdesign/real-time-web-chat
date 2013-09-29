@@ -215,7 +215,7 @@ define(['emoticons', 'timer', 'types', 'socket.io'], function(emoticons, Timer, 
                 socket.emit('send message', data);
             }
             // clear input tag
-            field.value = "";
+            field.value = '';
         },
 
         // generates the HTML element representing a message, and prints it.
@@ -318,8 +318,8 @@ define(['emoticons', 'timer', 'types', 'socket.io'], function(emoticons, Timer, 
         // already. Finally it sends a notification.
         // If you don't provide the data parameter, it will just enable notifications.
         sendNotification = function(data, callback) {
-            if (typeof Notification === "function") {
-                if (!Notification.permission || Notification.permission === "default") {
+            if (typeof Notification === 'function') {
+                if (!Notification.permission || Notification.permission === 'default') {
                     Notification.requestPermission(function(perm){
                         // for Chrome and Safari
                         // (because they haven't implemented Notification.permission yet)
@@ -328,7 +328,7 @@ define(['emoticons', 'timer', 'types', 'socket.io'], function(emoticons, Timer, 
                         }
                     });
                 }
-                if (Notification.permission === "granted" && data.text) {
+                if (Notification.permission === 'granted' && data.text) {
                     var notification = new Notification(data.name, {
                        body: data.text,
                        tag: data.name
