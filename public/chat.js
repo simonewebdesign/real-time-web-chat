@@ -335,7 +335,18 @@ define(['emoticons', 'timer', 'types', 'socket.io'], function(emoticons, Timer, 
                     });
                 }
             }
+        },
+
+        // load and play a sound.
+        playSound = function(path) {
+            // audio supported?
+            if (typeof window.Audio === 'function') {
+                var audioElem = new Audio();
+                audioElem.src = path;
+                audioElem.play();
+            }
         }
+
 
         // Removes an element from writingUsers.
         // value is the string to remove from the array.
