@@ -431,7 +431,6 @@ define(['emoticons', 'timer', 'types', 'socket.io'], function(emoticons, Timer, 
         printMessage(data);
         maybeScrollToBottom();
         sendNotification(data);
-        playSound('wav/message_smb_kick.wav');
     });
 
     socket.on('written', function(data) {
