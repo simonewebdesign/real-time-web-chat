@@ -317,7 +317,7 @@ define(['emoticons', 'timer', 'types', 'socket.io'], function(emoticons, Timer, 
         // the user the permission to send notifications, if it doesn't have it
         // already. Finally it sends a notification.
         // If you don't provide the data parameter, it will just enable notifications.
-        sendNotification = function(data) {
+        sendNotification = function(data, callback) {
             if (typeof Notification === "function") {
                 if (!Notification.permission || Notification.permission === "default") {
                     Notification.requestPermission(function(perm){
@@ -333,6 +333,9 @@ define(['emoticons', 'timer', 'types', 'socket.io'], function(emoticons, Timer, 
                        body: data.text,
                        tag: data.name
                     });
+                    if (typeof callback === 'function') {
+                        callback();
+                    }
                 }
             }
         },
@@ -430,7 +433,9 @@ define(['emoticons', 'timer', 'types', 'socket.io'], function(emoticons, Timer, 
         searchAndReplaceEmoticonsIn(data);
         printMessage(data);
         maybeScrollToBottom();
-        sendNotification(data);
+        sendNotification(data, function(){
+            playSound('wav/message_smb_kick.wav');
+        });
     });
 
     socket.on('written', function(data) {
