@@ -88,37 +88,12 @@ var MyApp = function() {
      *  Create the routing table entries + handlers for the application.
      */
     self.createRoutes = function() {
-        self.routes = { };
-
-        // Routes for /health, /asciimo, /env and /
-        self.routes['/health'] = function(req, res) {
-            res.send('1');
-        };
-
-        self.routes['/asciimo'] = function(req, res) {
-            var link = 'http://i.imgur.com/kmbjB.png';
-            res.send("<html><body><img src='" + link + "'></body></html>");
-        };
-
-        self.routes['/env'] = function(req, res) {
-            var content = 'Version: ' + process.version + '\n<br/>\n' +
-                          'Env: {<br/>\n<pre>';
-            //  Add env entries.
-            for (var k in process.env) {
-               content += '   ' + k + ': ' + process.env[k] + '\n';
-            }
-            content += '}\n</pre><br/>\n'
-            res.send(content);
-            res.send('<html>\n' +
-                     '  <head><title>Node.js Process Env</title></head>\n' +
-                     '  <body>\n<br/>\n' + content + '</body>\n</html>');
-        };
+        self.routes = {};
 
         // main route
         self.routes['/'] = function(req, res){
             res.render('page'); // page.jade is our template
         };
-
     };
 
 
@@ -150,7 +125,6 @@ var MyApp = function() {
      */
     self.initialize = function() {
         self.setupVariables();
-        /*self.populateCache();*/
         self.setupTerminationHandlers();
         self.initializeServer();
 
