@@ -17,7 +17,7 @@ var MyApp = function() {
     self.setupVariables = function() {
         self.appname = process.env.OPENSHIFT_APP_NAME || 'rtwc';
         self.ipaddress = process.env.OPENSHIFT_INTERNAL_IP || process.env.OPENSHIFT_NODEJS_IP;
-        self.port = process.env.OPENSHIFT_INTERNAL_PORT || process.env.OPENSHIFT_NODEJS_PORT || 8082;
+        self.port = process.env.OPENSHIFT_INTERNAL_PORT || process.env.OPENSHIFT_NODEJS_PORT || 8000;
         self.dbport = process.env.OPENSHIFT_MONGODB_DB_PORT || 27017;
         self.dbname = self.appname;
 
