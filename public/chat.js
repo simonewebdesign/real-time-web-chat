@@ -404,7 +404,7 @@ define(['emoticons', 'timer', 'types', 'socket.io'], function(emoticons, Timer, 
             type: types.SYSTEM,
             text: welcomeText
         }));
-        playSound('connection_smb_flagpole.wav');
+        playSound('wav/connection_smb_flagpole.wav');
     });
 
     // to all
