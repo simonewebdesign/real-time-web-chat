@@ -109,8 +109,9 @@ input.field
 .clearfix:after {
     clear: both;
 }
-
-@media only screen and (min-width:320px)  { body{font-size:1.333em; /* 16px */} }
-@media only screen and (min-width:768px)  { body{font-size:1.167em; /* 14px */} }
-@media only screen and (min-width:1024px) { body{font-size:1em; /* 12px */} }
-@media only screen and (min-width:1900px) { body{font-size:1.500em; /* 18px */} }
+/*
+@media only screen and (min-width:320px)  { body{ font-size:1.333em } }
+@media only screen and (min-width:768px)  { body{ font-size:1.167em } }
+@media only screen and (min-width:1024px) { body{ font-size:1em     } }
+@media only screen and (min-width:1900px) { body{ font-size:1.500em } }
+*/
