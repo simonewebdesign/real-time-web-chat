@@ -116,7 +116,7 @@ var MyApp = function() {
         }
 
         self.app.use(express.static(__dirname + '/public'));
-        self.app.use('/docs', express.static(__dirname + '/docs'));            
+        self.app.use('/docs', express.static(__dirname + '/docs'));
     };
 
 
@@ -160,21 +160,21 @@ var MyApp = function() {
 
             // 2) Let's see if the user is newish.
             socket.on('recognizing user', function (user) {
-                socket.set('nickname', user.name);                
+                socket.set('nickname', user.name);
                 socket.emit('user recognized', user);
             });
 
             // 3) Load the most recent messages for the
             //    user that has been connected.
-            // MongoClient.connect('mongodb://'+self.connection_string, function(err, db) {
-            //     if(err) throw err;
-            //     db.collection('messages').find().sort({$natural: -1}).limit(MONGODB_ITEMS_TO_LOAD_LIMIT).toArray(function(err, docs) {
-            //         if(err) throw err;
-            //         // send the recent messages to the client
-            //         socket.emit('messages loaded', docs.reverse());
-            //         db.close();
-            //     });
-            // });
+            MongoClient.connect('mongodb://'+self.connection_string, function(err, db) {
+                if(err) throw err;
+                db.collection('messages').find().sort({$natural: -1}).limit(MONGODB_ITEMS_TO_LOAD_LIMIT).toArray(function(err, docs) {
+                    if(err) throw err;
+                    // send the recent messages to the client
+                    socket.emit('messages loaded', docs.reverse());
+                    db.close();
+                });
+            });
 
             socket.on('set nickname', function (user) {
                 socket.set('nickname', user.newName, function () {
