@@ -13,8 +13,6 @@ define(['emoticons', 'timer', 'types', 'socket.io'], function(emoticons, Timer, 
         content =    document.querySelector('.messages'),
         notice =     document.querySelector('.notice'),
 
-        cmdRegex = /^\/([a-z0-9_-]+)\s?([a-z0-9_-]+)?\s?([a-z0-9_-]+)?$/i,
-
         // ## Functions
 
         // ### Getters and Setters
@@ -98,21 +96,23 @@ define(['emoticons', 'timer', 'types', 'socket.io'], function(emoticons, Timer, 
                     var htmlReplacement = '<img src="img/skype/' + replacement +
                      '" alt="' + search + '" />';
                     message.text = message.text.replace(search, htmlReplacement);
-                }                    
+                }
             }
             return message;
         },
 
         // is it a command?
-        isCommand = function(text) {
-            return cmdRegex.test(text);
+        isCommand = function(text, regex) {
+            var r = regex || /^\/([a-z0-9_-]+)\s?([a-z0-9_-]+)?\s?([a-z0-9_-]+)?$/i;
+            return r.test(text);
         },
 
         // gets command name and arguments from the provided text,
         // assuming that the text is an actual command.
         // You should call isCommand() before this.
-        getCommandFrom = function(text) {
-            var matches = cmdRegex.exec(text),
+        getCommandFrom = function(text, regex) {
+            var r = regex || /^\/([a-z0-9_-]+)\s?([a-z0-9_-]+)?\s?([a-z0-9_-]+)?$/i,
+                matches = r.exec(text),
                 name = matches[1],
                 args = [
                     matches[2], 
@@ -348,8 +348,32 @@ define(['emoticons', 'timer', 'types', 'socket.io'], function(emoticons, Timer, 
                 audioElem.src = path;
                 audioElem.play();
             }
-        }
+        },
 
+        isUrl = function(url, regex) {
+            var r = regex || /https?:\/\/(?:www\.|(?!www))[^\s\.]+\.[^\s]{2,}|www\.[^\s]+\.[^\s]{2,}/i;
+            return r.test(url);
+        },
+
+/*        searchAndReplaceURLsIn = function(data) {
+            var matches = data.text.match(urlRegex);
+            var search, replacement;
+            for (var k in matches) {
+
+                search = k,
+                replacement = emoticons.skype[i][k];
+
+                // the `search` emoticon is contained in `message`
+                if (message.text.indexOf(search) != -1) {
+                    var htmlReplacement = '<img src="img/skype/' + replacement +
+                     '" alt="' + search + '" />';
+                    message.text = message.text.replace(search, htmlReplacement);
+                }                    
+            }
+            return message;
+            }
+        }
+*/
 
         // Removes an element from writingUsers.
         // value is the string to remove from the array.
@@ -431,6 +455,7 @@ define(['emoticons', 'timer', 'types', 'socket.io'], function(emoticons, Timer, 
 
     socket.on('message', function(data) {
         searchAndReplaceEmoticonsIn(data);
+        // searchAndReplaceURLsIn(data);
         printMessage(data);
         maybeScrollToBottom();
         sendNotification(data, function(){
