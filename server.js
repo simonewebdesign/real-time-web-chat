@@ -5,7 +5,6 @@ var express = require('express')
   , io
   , MongoClient = require('mongodb').MongoClient
   , MONGODB_ITEMS_TO_LOAD_LIMIT = 50
-  , markdown = require('markdown').markdown
 
 var MyApp = function() {
 
@@ -190,8 +189,6 @@ var MyApp = function() {
             });
 
             socket.on('send message', function (data) {
-                // convert the message from markdown to html
-                data.text = markdown.toHTML(data.text);
                 // forward the data sent by the user to all other sockets
                 io.sockets.emit('message', data);
                 // Note: io.sockets.emit() !== socket.emit()
