@@ -286,12 +286,7 @@ define(['emoticons', 'timer', 'types', 'socket.io'], function(emoticons, Timer, 
             }
 
             var str = users.join(', ');
-            
-            if (users.length > 1) {
-                str += ' are ';
-            } else {
-                str += ' is ';
-            }
+            str += (users.length > 1) ? ' are ' : ' is ';
             str += 'writing...';
 
             notice.innerHTML = str;
