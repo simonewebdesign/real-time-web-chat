@@ -78,10 +78,9 @@ define(['emoticons', 'timer', 'types', 'socket.io'], function(emoticons, Timer, 
             }
         },
 
-        // eats a message object, and returns the same object
-        // with the text's placeholders replaced with images.
-        // The images actually are just plain HTML.
-        searchAndReplaceEmoticonsIn = function(message) {
+        // eats text, and returns the same text
+        // with its placeholders replaced with HTML <img> tags.
+        searchAndReplaceEmoticonsInEncodedString = function(text) {
 
             for (var i=0; i<emoticons.skype.length; i++) {
 
@@ -92,14 +91,14 @@ define(['emoticons', 'timer', 'types', 'socket.io'], function(emoticons, Timer, 
                 }
 
                 // the `search` emoticon is contained in `message`
-                if (message.text.indexOf(search) != -1) {
+                if (text.indexOf(search) != -1) {
                     var htmlReplacement = '<img src="img/skype/' + replacement +
                      '" alt="' + search + '" />';
-                    message.text = message.text.replace(search, htmlReplacement);
+                    text = text.replace(search, htmlReplacement);
                 }
             }
-            return message;
-        },
+            return text;            
+        }
 
         // is it a command?
         isCommand = function(text, regex) {
@@ -262,7 +261,13 @@ define(['emoticons', 'timer', 'types', 'socket.io'], function(emoticons, Timer, 
             // avoids an XSS vector attack.
             nicknameHTMLElement.textContent = data.name;
             idHTMLElement.textContent = data.id;
-            textWrapperHTMLElement.textContent = data.text;
+
+            // escape unsafe characters such as < and >
+            textWrapperHTMLElement.innerText = textWrapperHTMLElement.textContent = data.text;
+            // console.log(textWrapperHTMLElement.innerHTML); // this is now an HTML encoded string
+            var escapedHTMLString = searchAndReplaceEmoticonsInEncodedString(textWrapperHTMLElement.innerHTML);
+            textWrapperHTMLElement.innerHTML = escapedHTMLString;
+
             timeHTMLElement.textContent = (new Date(data.time)).toLocaleTimeString();
 
             // append elements to the wrappers
@@ -386,7 +391,6 @@ define(['emoticons', 'timer', 'types', 'socket.io'], function(emoticons, Timer, 
             return false;
         }
 
-
     // ### Web Socket events
 
     socket.on('connected', function(data) {
@@ -454,8 +458,6 @@ define(['emoticons', 'timer', 'types', 'socket.io'], function(emoticons, Timer, 
     });
 
     socket.on('message', function(data) {
-        searchAndReplaceEmoticonsIn(data);
-        // searchAndReplaceURLsIn(data);
         printMessage(data);
         maybeScrollToBottom();
         sendNotification(data, function(){
