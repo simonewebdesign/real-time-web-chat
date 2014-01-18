@@ -255,10 +255,15 @@ define(['emoticons', 'timer', 'types', 'socket.io'], function(emoticons, Timer, 
             //  textHTMLElement     = document.createElement('span'),
                 timeHTMLElement     = document.createElement('time');
 
-            nicknameHTMLElement.innerHTML = data.name;
-            idHTMLElement.innerHTML = data.id;
-            textWrapperHTMLElement.innerHTML = data.text;
-            timeHTMLElement.innerHTML = (new Date(data.time)).toLocaleTimeString();
+            // From MDN: Quite often, in
+            // order to retrieve or write text within an element, people use
+            // `innerHTML`. textContent should be used instead. Since the text is
+            // not processed it's likely to have better performance. Moreover, this
+            // avoids an XSS vector attack.
+            nicknameHTMLElement.textContent = data.name;
+            idHTMLElement.textContent = data.id;
+            textWrapperHTMLElement.textContent = data.text;
+            timeHTMLElement.textContent = (new Date(data.time)).toLocaleTimeString();
 
             // append elements to the wrappers
             nicknameWrapperHTMLElement.appendChild(nicknameHTMLElement);
