@@ -85,6 +85,7 @@ define({
     {'(swear)' : 'hiddenswear.gif'},
     {'(tmi)' : 'hiddentmi.gif'},
     {'(toivo)' : 'hiddentoivo.gif'}
+    {':ifyouknowwhatimean:' : 'ifyouknowwhatimean.jpg'}
   ],
   
   msn: [
