@@ -84,7 +84,7 @@ define({
     {'(squirrel)' : 'hiddensquirrel.gif'},
     {'(swear)' : 'hiddenswear.gif'},
     {'(tmi)' : 'hiddentmi.gif'},
-    {'(toivo)' : 'hiddentoivo.gif'}
+    {'(toivo)' : 'hiddentoivo.gif'},
     {':ifyouknowwhatimean:' : 'ifyouknowwhatimean.jpg'}
   ],
   
