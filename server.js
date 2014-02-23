@@ -36,12 +36,12 @@ var MyApp = function() {
           self.dbport + '/' +
           self.dbname;
         } else {
-          // default to a 'localhost' configuration:  
+          // default to a 'localhost' configuration:
           console.log('We are in localhost');
           self.connection_string = 'admin:VVkkGUKNh2by@' + self.ipaddress + ':' + self.dbport + '/' + self.dbname;
         }
     };
-    
+
 
     /**
      *  Retrieve entry (content) from cache.
@@ -151,10 +151,10 @@ var MyApp = function() {
             //  - io.sockets.emit()         emits to all sockets. NO, not exactly.
             // It means: all sockets will emit this!
 
-            // 1) Every time a client connects, 
+            // 1) Every time a client connects,
             //    we send the Socket ID to him.
             socket.emit('connected', {id: socket.id});
-            console.log('Socket with ID %s connected on %s', 
+            console.log('Socket with ID %s connected on %s',
                 socket.id, new Date());
 
             // 2) Let's see if the user is newish.
@@ -211,7 +211,7 @@ var MyApp = function() {
                     if(err) throw err;
                     socket.emit('disconnected', {
                         id: socket.id,
-                        name: name 
+                        name: name
                     });
                     console.log('%s (%s) disconnected. %s', name, socket.id, new Date());
                 });

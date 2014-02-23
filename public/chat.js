@@ -97,7 +97,7 @@ define(['emoticons', 'timer', 'types', 'socket.io'], function(emoticons, Timer, 
                     text = text.replace(search, htmlReplacement);
                 }
             }
-            return text;            
+            return text;
         }
 
         // is it a command?
@@ -114,7 +114,7 @@ define(['emoticons', 'timer', 'types', 'socket.io'], function(emoticons, Timer, 
                 matches = r.exec(text),
                 name = matches[1],
                 args = [
-                    matches[2], 
+                    matches[2],
                     matches[3]
                 ];
 
@@ -124,7 +124,7 @@ define(['emoticons', 'timer', 'types', 'socket.io'], function(emoticons, Timer, 
             }
         },
 
-        // evaluates a command. 
+        // evaluates a command.
         // the first parameter is the command name, while
         // the second is an array containing the arguments.
         evaluate = function(command, args) {
@@ -145,7 +145,7 @@ define(['emoticons', 'timer', 'types', 'socket.io'], function(emoticons, Timer, 
 
                     // notify the server
                     socket.emit('set nickname', {
-                        oldName: getNick(), 
+                        oldName: getNick(),
                         newName: name
                     });
 
@@ -286,7 +286,7 @@ define(['emoticons', 'timer', 'types', 'socket.io'], function(emoticons, Timer, 
         },
 
         // displays a notice like: *john is writing...*
-        // the argument is an array of the users that 
+        // the argument is an array of the users that
         // are currently writing something.
         printNotice = function(users) {
 
@@ -433,7 +433,7 @@ define(['emoticons', 'timer', 'types', 'socket.io'], function(emoticons, Timer, 
             name: 'Server',
             type: types.SYSTEM,
             text: data.name + ' has quit.'
-        }));        
+        }));
         playSound('wav/disconnection_smb_bowserfalls.wav');
     });
 

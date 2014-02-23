@@ -1,11 +1,11 @@
 define(function() {
-  
+
   // A timer. Useful to display notices in our web chat app.
   // function callback
   // object   options
   var Timer = function(callback, options) {
 
-    var self = this, 
+    var self = this,
         options = options || {};
 
     this.delay = options.delay || 3000;

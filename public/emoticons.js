@@ -1,4 +1,4 @@
-define({   
+define({
   skype: [
     {'(angel)' : 'angel.gif'},
     {':@' : 'angry.gif'},
@@ -87,7 +87,7 @@ define({
     {'(toivo)' : 'hiddentoivo.gif'},
     {':ifyouknowwhatimean:' : 'ifyouknowwhatimean.jpg'}
   ],
-  
+
   msn: [
     {':laugh:' : 'MSNlaugh.gif'},
     {':airplane:' : 'msn-airplaine.gif'},
@@ -161,8 +161,8 @@ define({
     {':turtle:' : 'MSNturtle.gif'},
     {':umbrella:' : 'msn-umbrella.gif'},
     {':bat:' : 'msn-vampirebat.gif'},
-    {'wink::' : 'MSNwink.gif'} 
-  ]  
+    {'wink::' : 'MSNwink.gif'}
+  ]
 });
 
 
