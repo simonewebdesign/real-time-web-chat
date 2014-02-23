@@ -1,7 +1,9 @@
-div, input {
-  -moz-box-sizing:border-box;
-  -webkit-box-sizing:border-box;  
-  box-sizing: border-box;
+*,
+*:before,
+*:after {
+  -webkit-box-sizing: border-box;
+     -moz-box-sizing: border-box;
+          box-sizing: border-box;
 }
 
 html, body {
@@ -15,7 +17,7 @@ body {
   overflow: hidden;
 }
 
-input, button {
+input, button, textarea {
   border: 0;
 }
 
