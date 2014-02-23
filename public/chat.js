@@ -360,26 +360,6 @@ define(['emoticons', 'timer', 'types', 'socket.io'], function(emoticons, Timer, 
             return r.test(url);
         },
 
-/*        searchAndReplaceURLsIn = function(data) {
-            var matches = data.text.match(urlRegex);
-            var search, replacement;
-            for (var k in matches) {
-
-                search = k,
-                replacement = emoticons.skype[i][k];
-
-                // the `search` emoticon is contained in `message`
-                if (message.text.indexOf(search) != -1) {
-                    var htmlReplacement = '<img src="img/skype/' + replacement +
-                     '" alt="' + search + '" />';
-                    message.text = message.text.replace(search, htmlReplacement);
-                }                    
-            }
-            return message;
-            }
-        }
-*/
-
         // Removes an element from writingUsers.
         // value is the string to remove from the array.
         // Returns an array with the removed element; false otherwise.
@@ -518,7 +498,6 @@ define(['emoticons', 'timer', 'types', 'socket.io'], function(emoticons, Timer, 
     field.addEventListener('keyup', function(event) {
         // user pressed enter? then it's a message.
         if (event.keyCode == 13 && !event.shiftKey) {
-            // send it
             send(message());
         }
         // alerts the server that this user is writing a message
@@ -528,7 +507,7 @@ define(['emoticons', 'timer', 'types', 'socket.io'], function(emoticons, Timer, 
 
     // for the notifications
     window.onfocus = function() { window.isFocused = true; };
-    window.onblur =  function() { window.isFocused = false; };
+    window.onblur  = function() { window.isFocused = false; };
 
 // *"The last 29 days of the month are the hardest." - Nikola Tesla*
 });
