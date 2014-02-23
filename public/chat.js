@@ -517,7 +517,8 @@ define(['emoticons', 'timer', 'types', 'socket.io'], function(emoticons, Timer, 
 
     field.addEventListener('keyup', function(event) {
         // user pressed enter? then it's a message.
-        if (event.keyCode == 13) {
+        if (event.keyCode == 13 && !event.shiftKey) {
+            // send it
             send(message());
         }
         // alerts the server that this user is writing a message
