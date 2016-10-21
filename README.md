@@ -93,7 +93,7 @@ To get a full list of environment variables, simply add a line in your
 
 ## Test Suite
 
-First install [Jasmine](http://pivotal.github.io/jasmine/):
+First install [Jasmine](https://jasmine.github.io/):
 
     $ npm install jasmine-node -g
 
