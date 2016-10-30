@@ -76,6 +76,12 @@ define(['emoticons', 'timer', 'types', 'socket.io'], function(emoticons, Timer, 
                 type: type,
                 time: time
             }
+        },   
+
+        // surround links with <a> tagged html
+        linkify = function(text) {
+            var isLink = /((https?:\/\/)?([\da-z\.-]+)\.([a-z\.]{2,6})([\S]*)*\/?)/g;
+            return text.replace(isLink, '<a href="$1">$1</a>');                        
         },
 
         // eats text, and returns the same text
@@ -266,7 +272,7 @@ define(['emoticons', 'timer', 'types', 'socket.io'], function(emoticons, Timer, 
             textWrapperHTMLElement.innerText = textWrapperHTMLElement.textContent = data.text;
             // console.log(textWrapperHTMLElement.innerHTML); // this is now an HTML encoded string
             var escapedHTMLString = searchAndReplaceEmoticonsInEncodedString(textWrapperHTMLElement.innerHTML);
-            textWrapperHTMLElement.innerHTML = escapedHTMLString;
+            textWrapperHTMLElement.innerHTML = linkify(escapedHTMLString);
 
             timeHTMLElement.textContent = (new Date(data.time)).toLocaleTimeString();
 
