@@ -94,7 +94,7 @@ define(['emoticons', 'timer', 'types', 'socket.io'], function(emoticons, Timer, 
                 if (text.indexOf(search) != -1) {
                     var htmlReplacement = '<img src="img/skype/' + replacement +
                      '" alt="' + search + '" />';
-                    text = text.replace(search, htmlReplacement);
+                    text = text.replace(new RegExp(search, 'g'), htmlReplacement);
                 }
             }
             return text;
